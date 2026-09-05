@@ -1,0 +1,2311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>До нашей свадьбы</title>
+<meta name="description" content="Отсчёт времени до свадьбы" />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#111827" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,340;0,9..144,500;1,9..144,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-1: #0b0f1a;
+    --ink-2: #131a2b;
+    --cream: #f4ede1;
+    --cream-dim: #cfc6b6;
+    --gold: #c7a15f;
+    --gold-soft: rgba(199,161,95,0.35);
+    --rose: #cf9f97;
+    --line: rgba(244,237,225,0.14);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    min-height:100%;
+    background: radial-gradient(120% 90% at 50% -10%, #1b2338 0%, var(--ink-2) 45%, var(--ink-1) 100%);
+    color: var(--cream);
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    height: 100vh;
+    height: 100dvh;
+    display:block;
+    overflow:hidden;
+    position:relative;
+  }
+
+  .pages-viewport{
+    position:relative;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+  }
+
+  .pages{
+    display:flex;
+    height:100%;
+    touch-action: pan-y;
+    transition: transform 340ms cubic-bezier(.2,.8,.2,1);
+  }
+
+  .pages.dragging{ transition:none; }
+
+  .page{
+    flex: 0 0 100vw;
+    width:100vw;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 32px 20px;
+    overflow-y:auto;
+  }
+
+  .dots{
+    position:fixed;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    left:50%;
+    transform: translateX(-50%);
+    display:flex;
+    gap:7px;
+    z-index: 15;
+    pointer-events:none;
+  }
+
+  .dots button{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    border:none;
+    padding:0;
+    background: var(--line);
+    cursor:default;
+    transition: background 200ms ease, transform 200ms ease;
+  }
+
+  .dots button.active{
+    background: var(--gold);
+    transform: scale(1.3);
+  }
+
+  .veil{
+    position: fixed;
+    inset: 0;
+    pointer-events:none;
+    background:
+      radial-gradient(1px 1px at 12% 22%, var(--gold-soft) 0, transparent 60%),
+      radial-gradient(1px 1px at 82% 18%, var(--gold-soft) 0, transparent 60%),
+      radial-gradient(1.5px 1.5px at 68% 72%, var(--gold-soft) 0, transparent 60%),
+      radial-gradient(1px 1px at 24% 80%, var(--gold-soft) 0, transparent 60%),
+      radial-gradient(1.5px 1.5px at 90% 60%, var(--gold-soft) 0, transparent 60%),
+      radial-gradient(1px 1px at 40% 12%, var(--gold-soft) 0, transparent 60%);
+    opacity:0.7;
+  }
+
+  .card{
+    position:relative;
+    width:100%;
+    max-width: 440px;
+    text-align:center;
+    animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
+  }
+
+  @keyframes rise{
+    from{ opacity:0; transform: translateY(14px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  .rings{
+    width:56px;
+    height:34px;
+    margin: 0 auto 22px;
+    opacity:0.9;
+  }
+
+  .eyebrow{
+    font-family:'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 17px;
+    letter-spacing: 0.02em;
+    color: var(--rose);
+    margin: 0 0 6px;
+  }
+
+  h1{
+    font-family:'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 340;
+    font-size: clamp(30px, 8vw, 42px);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+    color: var(--cream);
+  }
+
+  .date-line{
+    font-size: 14px;
+    color: var(--cream-dim);
+    margin: 0 0 34px;
+  }
+
+  .switch{
+    display:inline-flex;
+    gap: 6px;
+    padding: 5px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    margin-bottom: 40px;
+  }
+
+  .switch button{
+    appearance:none;
+    border:none;
+    background: transparent;
+    color: var(--cream-dim);
+    font-family:'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 16px;
+    border-radius: 999px;
+    cursor:pointer;
+    transition: background 220ms ease, color 220ms ease;
+    white-space: nowrap;
+  }
+
+  .switch button.active{
+    background: var(--gold);
+    color: #211705;
+  }
+
+  .switch button:not(.active):hover{
+    color: var(--cream);
+  }
+
+  .clock{
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap: clamp(10px, 3vw, 18px);
+    margin-bottom: 30px;
+  }
+
+  .unit{
+    min-width: 62px;
+  }
+
+  .num{
+    font-family:'Fraunces', serif;
+    font-weight: 340;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(38px, 11vw, 58px);
+    line-height: 1;
+    color: var(--cream);
+    animation: settle 500ms ease both;
+  }
+
+  @keyframes settle{
+    from{ opacity: 0.3; transform: translateY(3px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  .unit-label{
+    margin-top: 8px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--cream-dim);
+  }
+
+  .sep{
+    font-family:'Fraunces', serif;
+    font-weight: 300;
+    font-size: clamp(28px, 8vw, 44px);
+    color: var(--gold-soft);
+    padding-top: 2px;
+  }
+
+  .rule{
+    width: 64px;
+    height:1px;
+    background: var(--line);
+    margin: 0 auto 22px;
+  }
+
+  .closing{
+    font-family:'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--cream-dim);
+    margin: 0 0 30px;
+    min-height: 20px;
+  }
+
+  .closing strong{
+    color: var(--gold);
+    font-style: normal;
+  }
+
+  #installBtn{
+    appearance:none;
+    display:none;
+    align-items:center;
+    gap:8px;
+    margin: 0 auto;
+    background: transparent;
+    border: 1px solid var(--gold-soft);
+    color: var(--gold);
+    font-family:'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 11px 20px;
+    border-radius: 999px;
+    cursor:pointer;
+    transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+  }
+
+  #installBtn.show{ display:inline-flex; }
+
+  #installBtn:hover{
+    background: var(--gold);
+    color: #211705;
+    border-color: var(--gold);
+  }
+
+  .hint{
+    margin-top: 16px;
+    font-size: 12px;
+    color: rgba(207,198,182,0.55);
+    line-height: 1.5;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .card, .num{ animation: none !important; }
+  }
+
+  /* --- Settings gear button --- */
+  .gear-btn{
+    position: fixed;
+    top: max(16px, env(safe-area-inset-top));
+    right: max(16px, env(safe-area-inset-right));
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.04);
+    color: var(--cream-dim);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index: 20;
+    transition: background 200ms ease, color 200ms ease, border-color 200ms ease, transform 200ms ease;
+  }
+
+  .gear-btn:hover{
+    color: var(--gold);
+    border-color: var(--gold-soft);
+    transform: rotate(20deg);
+  }
+
+  .gear-btn svg{ width:18px; height:18px; }
+
+  /* --- Overlays (lock screen + settings modal) --- */
+  .overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(6,9,16,0.72);
+    backdrop-filter: blur(6px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+    z-index: 50;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity 220ms ease;
+  }
+
+  .overlay.show{
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  .sheet{
+    width:100%;
+    max-width: 360px;
+    background: linear-gradient(180deg, #171f33 0%, #10162578 100%), var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 28px 24px;
+    text-align:center;
+    transform: translateY(10px);
+    transition: transform 220ms ease;
+  }
+
+  .overlay.show .sheet{ transform: translateY(0); }
+
+  .sheet h2{
+    font-family:'Fraunces', serif;
+    font-weight: 400;
+    font-size: 20px;
+    margin: 0 0 6px;
+    color: var(--cream);
+  }
+
+  .sheet p.sub{
+    font-size: 13px;
+    color: var(--cream-dim);
+    margin: 0 0 22px;
+  }
+
+  .pin-row{
+    display:flex;
+    justify-content:center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .pin-row input{
+    width: 46px;
+    height: 54px;
+    text-align:center;
+    font-family:'Fraunces', serif;
+    font-size: 24px;
+    color: var(--cream);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    caret-color: var(--gold);
+    outline:none;
+    transition: border-color 160ms ease;
+  }
+
+  .pin-row input:focus{
+    border-color: var(--gold);
+  }
+
+  .pin-error{
+    font-size: 12px;
+    color: var(--rose);
+    min-height: 16px;
+    margin: -8px 0 14px;
+  }
+
+  .sheet-btn{
+    appearance:none;
+    width:100%;
+    border:none;
+    background: var(--gold);
+    color: #211705;
+    font-family:'Manrope', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 12px;
+    cursor:pointer;
+    margin-bottom: 10px;
+    transition: filter 160ms ease;
+  }
+
+  .sheet-btn:hover{ filter: brightness(1.08); }
+
+  .sheet-btn.ghost{
+    background: transparent;
+    color: var(--cream-dim);
+    border: 1px solid var(--line);
+    font-weight: 500;
+  }
+
+  .sheet-btn.ghost:hover{ color: var(--cream); }
+
+  .sheet-btn.danger{
+    background: transparent;
+    color: var(--rose);
+    border: 1px solid rgba(207,159,151,0.35);
+    font-weight: 500;
+  }
+
+  .settings-status{
+    font-size: 13px;
+    color: var(--cream-dim);
+    margin: 0 0 20px;
+  }
+
+  .settings-status strong{ color: var(--gold); }
+
+  .step{ display:none; }
+  .step.active{ display:block; }
+
+  /* --- Page 2: dhikr counter --- */
+  .counter-card{
+    width:100%;
+    max-width: 420px;
+    text-align:center;
+  }
+
+  .counter-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom: 4px;
+  }
+
+  .counter-head h2{
+    font-family:'Fraunces', serif;
+    font-weight: 340;
+    font-size: 22px;
+    color: var(--cream);
+    margin:0;
+    text-align:left;
+  }
+
+  .minus-btn{
+    width: 30px;
+    height: 30px;
+    border-radius:50%;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.04);
+    color: var(--cream-dim);
+    font-size: 16px;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: color 160ms ease, border-color 160ms ease;
+  }
+
+  .minus-btn:hover{ color: var(--gold); border-color: var(--gold-soft); }
+  .minus-btn:active{ transform: scale(0.92); }
+
+  .counter-hint{
+    font-size: 12.5px;
+    color: var(--cream-dim);
+    text-align:left;
+    margin: 0 0 20px;
+  }
+
+  .counter-hint strong{ color: var(--gold); font-weight:600; }
+
+  .tasbih-list{
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+    margin-bottom: 26px;
+  }
+
+  .tasbih-row{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    padding: 13px 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    overflow:hidden;
+    cursor:pointer;
+    user-select:none;
+    -webkit-user-select:none;
+    transition: border-color 200ms ease, background 200ms ease;
+  }
+
+  .tasbih-row .row-progress{
+    position:absolute;
+    inset: 0;
+    width:0%;
+    background: linear-gradient(90deg, rgba(199,161,95,0.28), rgba(199,161,95,0.08));
+    pointer-events:none;
+  }
+
+  .tasbih-row.pressing .row-progress{
+    background: linear-gradient(90deg, rgba(199,161,95,0.28), rgba(199,161,95,0.08));
+  }
+
+  .tasbih-row.reset-pressing .row-progress{
+    background: linear-gradient(90deg, rgba(207,159,151,0.32), rgba(207,159,151,0.1));
+  }
+
+  .tasbih-row.selected{
+    border-color: var(--gold);
+    background: rgba(199,161,95,0.08);
+  }
+
+  .tasbih-row.just-selected{
+    animation: pop 380ms ease;
+  }
+
+  @keyframes pop{
+    0%{ transform: scale(1); }
+    40%{ transform: scale(1.03); }
+    100%{ transform: scale(1); }
+  }
+
+  .tasbih-row.just-reset{
+    animation: resetFlash 420ms ease;
+  }
+
+  @keyframes resetFlash{
+    0%{ background: rgba(207,159,151,0.35); }
+    100%{ background: rgba(255,255,255,0.03); }
+  }
+
+  .row-main{
+    position:relative;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    min-width:0;
+    z-index:1;
+  }
+
+  .row-name{
+    font-family:'Manrope', sans-serif;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--cream);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width: 100%;
+  }
+
+  .row-meta{
+    font-size: 10.5px;
+    color: var(--cream-dim);
+    opacity: 0.75;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width: 100%;
+  }
+
+  .row-name-input{
+    font-family:'Manrope', sans-serif;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--cream);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--gold-soft);
+    border-radius: 6px;
+    padding: 2px 6px;
+    width: 100%;
+    outline:none;
+  }
+
+  .row-count{
+    position:relative;
+    font-family:'Fraunces', serif;
+    font-variant-numeric: tabular-nums;
+    font-size: 20px;
+    color: var(--gold);
+    min-width: 34px;
+    text-align:right;
+    z-index:1;
+  }
+
+  .row-edit{
+    position:relative;
+    width: 30px;
+    height: 30px;
+    flex-shrink:0;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--cream-dim);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:1;
+    transition: color 160ms ease;
+  }
+
+  .row-edit:hover{ color: var(--gold); }
+  .row-edit svg{ width:15px; height:15px; }
+
+  .row-settings{
+    position:relative;
+    width: 30px;
+    height: 30px;
+    flex-shrink:0;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--cream-dim);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:1;
+    overflow:hidden;
+    transition: color 160ms ease;
+  }
+
+  .row-settings-fill{
+    position:absolute;
+    inset:0;
+    width:0%;
+    background: rgba(199,161,95,0.35);
+    z-index:0;
+    border-radius:50%;
+  }
+
+  .row-settings svg{ position:relative; z-index:1; }
+
+  .row-settings:hover{ color: var(--gold); }
+  .row-settings svg{ width:15px; height:15px; }
+
+  /* --- Row settings modal fields --- */
+  .field{
+    text-align:left;
+    margin-bottom: 16px;
+  }
+
+  .field label{
+    display:block;
+    font-size: 12px;
+    color: var(--cream-dim);
+    margin-bottom: 6px;
+  }
+
+  .field-input{
+    width:100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--cream);
+    font-family:'Manrope', sans-serif;
+    font-size: 15px;
+    padding: 10px 12px;
+    outline:none;
+    transition: border-color 160ms ease;
+  }
+
+  .field-input:focus{ border-color: var(--gold); }
+
+  .mode-toggle{
+    display:flex;
+    gap: 8px;
+  }
+
+  .mode-btn{
+    flex:1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.03);
+    color: var(--cream-dim);
+    font-family:'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor:pointer;
+    transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+  }
+
+  .mode-btn.active{
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(199,161,95,0.1);
+  }
+
+  .plus-btn{
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-soft);
+    background: radial-gradient(circle at 50% 40%, rgba(199,161,95,0.22), rgba(199,161,95,0.06));
+    color: var(--gold);
+    font-family:'Fraunces', serif;
+    font-size: 46px;
+    font-weight: 300;
+    line-height:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin: 0 auto 22px;
+    cursor:pointer;
+    transition: transform 120ms ease, background 200ms ease;
+  }
+
+  .plus-btn:active{ transform: scale(0.94); background: rgba(199,161,95,0.22); }
+
+  .reset-btn{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin: 0 auto;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(207,159,151,0.3);
+    background: transparent;
+    color: var(--rose);
+    font-family:'Manrope', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor:pointer;
+    overflow:hidden;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+
+  .reset-btn .reset-fill{
+    position:absolute;
+    inset:0;
+    width:0%;
+    background: rgba(207,159,151,0.28);
+    z-index:0;
+  }
+
+  .reset-btn span{ position:relative; z-index:1; }
+
+  .reset-btn.compact{
+    display:inline-flex;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .reset-btn.compact .reset-label{
+    display:none;
+  }
+
+  .reset-btn.compact svg{
+    width: 15px;
+    height: 15px;
+    position:relative;
+    z-index:1;
+  }
+
+  .head-actions{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+  }
+
+  /* --- Page 3: daily calendar strip --- */
+  .month-title{
+    font-family:'Fraunces', serif;
+    font-weight: 340;
+    font-size: 20px;
+    color: var(--cream);
+    text-align:left;
+    margin: 0 0 12px;
+    text-transform: capitalize;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:none;
+    border:none;
+    padding:0;
+  }
+
+  .month-title svg{
+    width:14px;
+    height:14px;
+    opacity:0.6;
+    flex-shrink:0;
+  }
+
+  .cal-sheet{
+    max-width: 340px;
+  }
+
+  .cal-grid{
+    display:grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin: 10px 0 4px;
+  }
+
+  .cal-dow{
+    font-size: 10.5px;
+    color: var(--cream-dim);
+    text-align:center;
+    padding-bottom: 4px;
+  }
+
+  .cal-day{
+    position:relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.03);
+    color: var(--cream-dim);
+    font-family:'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition: border-color 160ms ease, color 160ms ease;
+  }
+
+  .cal-day.empty{
+    visibility:hidden;
+    cursor:default;
+  }
+
+  .cal-day.today{
+    border-color: var(--rose);
+  }
+
+  .cal-day.cal-active{
+    border-color: var(--gold);
+    color: var(--cream);
+  }
+
+  .cal-day.done{
+    color: var(--cream);
+    border-color: rgba(63,166,106,0.55);
+    background: rgba(63,166,106,0.16);
+  }
+
+  .cal-day.cal-active.done{
+    border-color: var(--gold);
+  }
+
+  .cal-check{
+    position:absolute;
+    top: -4px;
+    right: -4px;
+    width: 15px;
+    height: 15px;
+    border-radius:50%;
+    background: #3fa66a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border: 1.5px solid var(--ink-2);
+  }
+
+  .cal-check svg{
+    width:9px;
+    height:9px;
+    stroke: white;
+    stroke-width: 3;
+  }
+
+  .cal-legend{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-size: 11.5px;
+    color: var(--cream-dim);
+    margin-top: 14px;
+  }
+
+  .cal-legend .dot{
+    width:11px;
+    height:11px;
+    border-radius:50%;
+    background: #3fa66a;
+  }
+
+  .day-strip{
+    display:flex;
+    gap: 8px;
+    overflow-x:auto;
+    padding: 2px 2px 14px;
+    margin-bottom: 12px;
+    scrollbar-width: none;
+  }
+
+  .day-strip::-webkit-scrollbar{ display:none; }
+
+  .day-pill{
+    flex: 0 0 auto;
+    width: 40px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.03);
+    color: var(--cream-dim);
+    font-family:'Manrope', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    user-select:none;
+    -webkit-user-select:none;
+    transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+  }
+
+  .day-fill{
+    position:absolute;
+    inset:0;
+    width:0%;
+    background: linear-gradient(90deg, rgba(199,161,95,0.32), rgba(199,161,95,0.12));
+    z-index:0;
+  }
+
+  .day-pill span.day-num{
+    position:relative;
+    z-index:1;
+  }
+
+  .day-pill.today::after{
+    content:'';
+    position:absolute;
+    bottom:6px;
+    width:4px;
+    height:4px;
+    border-radius:50%;
+    background: var(--rose);
+    z-index:1;
+  }
+
+  .day-pill.active-day{
+    border-color: var(--gold);
+    background: rgba(199,161,95,0.16);
+    color: var(--cream);
+  }
+
+  .day-pill.viewing{
+    border-color: var(--rose);
+    color: var(--cream);
+  }
+
+  .day-pill:active{ transform: scale(0.94); }
+</style>
+</head>
+<body>
+<div class="veil"></div>
+
+<button class="gear-btn" id="gearBtn" type="button" aria-label="Настройки">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"></circle>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.13.42.4.79.76 1.05.36.26.79.4 1.24.4H21.5a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+  </svg>
+</button>
+
+<!-- Lock screen: shown on load if a PIN is saved -->
+<div class="overlay" id="lockOverlay">
+  <div class="sheet">
+    <h2>Введите пароль</h2>
+    <p class="sub">4 цифры, чтобы открыть приложение</p>
+    <div class="pin-row" id="lockPinRow">
+      <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+      <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+      <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+      <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+    </div>
+    <p class="pin-error" id="lockError"></p>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="overlay" id="settingsOverlay">
+  <div class="sheet">
+    <!-- Step: ask current pin before allowing changes (only if pin exists) -->
+    <div class="step" id="stepVerify">
+      <h2>Введите пароль</h2>
+      <p class="sub">чтобы изменить настройки</p>
+      <div class="pin-row" id="verifyPinRow">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+      </div>
+      <p class="pin-error" id="verifyError"></p>
+      <button class="sheet-btn ghost" id="verifyCancel" type="button">Отмена</button>
+    </div>
+
+    <!-- Step: main settings menu -->
+    <div class="step" id="stepMenu">
+      <h2>Настройки</h2>
+      <p class="settings-status" id="pinStatus">Пароль не установлен</p>
+      <button class="sheet-btn" id="setPinBtn" type="button">Установить пароль</button>
+      <button class="sheet-btn danger" id="removePinBtn" type="button" style="display:none;">Убрать пароль</button>
+
+      <div class="field" style="margin-top:6px;">
+        <label for="holdRowInput">Удержание выбора зикра (сек)</label>
+        <input type="number" inputmode="decimal" min="0.5" step="0.5" id="holdRowInput" class="field-input">
+      </div>
+      <div class="field">
+        <label for="holdResetInput">Удержание сброса (сек)</label>
+        <input type="number" inputmode="decimal" min="0.5" step="0.5" id="holdResetInput" class="field-input">
+      </div>
+      <div class="field">
+        <label for="holdDayInput">Удержание выбора дня (сек)</label>
+        <input type="number" inputmode="decimal" min="0.5" step="0.5" id="holdDayInput" class="field-input">
+      </div>
+      <div class="field">
+        <label for="holdSettingsInput">Удержание кнопки настроек зикра (сек)</label>
+        <input type="number" inputmode="decimal" min="0.5" step="0.5" id="holdSettingsInput" class="field-input">
+      </div>
+      <button class="sheet-btn" id="holdTimesSave" type="button">Сохранить время удержания</button>
+
+      <div class="field">
+        <label for="cheatInput">Чит-код</label>
+        <input type="text" autocomplete="off" id="cheatInput" class="field-input" placeholder="•••">
+      </div>
+
+      <button class="sheet-btn ghost" id="menuClose" type="button">Закрыть</button>
+    </div>
+
+    <!-- Step: set / change new 4-digit pin -->
+    <div class="step" id="stepSetPin">
+      <h2>Новый пароль</h2>
+      <p class="sub">придумайте 4 цифры</p>
+      <div class="pin-row" id="newPinRow">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" type="password">
+      </div>
+      <p class="pin-error" id="newPinError"></p>
+      <button class="sheet-btn ghost" id="setPinCancel" type="button">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<!-- Row settings modal: daily goal, mode, step -->
+<div class="overlay" id="rowSettingsOverlay">
+  <div class="sheet">
+    <h2 id="rowSettingsTitle">Настройки счётчика</h2>
+    <p class="sub">цель на день, режим и шаг</p>
+
+    <div class="field">
+      <label for="goalInput">Цель на день</label>
+      <input type="number" inputmode="numeric" min="0" id="goalInput" class="field-input">
+    </div>
+
+    <div class="field">
+      <label>Режим счётчика</label>
+      <div class="mode-toggle">
+        <button type="button" class="mode-btn" id="modeNormalBtn">Обычный</button>
+        <button type="button" class="mode-btn" id="modeReverseBtn">Обратный</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="stepInput">Шаг (интервал)</label>
+      <input type="number" inputmode="numeric" min="1" id="stepInput" class="field-input">
+    </div>
+
+    <button class="sheet-btn" id="rowSettingsSave" type="button">Сохранить</button>
+    <button class="sheet-btn ghost" id="rowSettingsCancel" type="button">Отмена</button>
+  </div>
+</div>
+
+<!-- Month calendar: shows completed days with a green mark -->
+<div class="overlay" id="monthCalendarOverlay">
+  <div class="sheet cal-sheet">
+    <h2 id="calTitle">Месяц</h2>
+    <p class="sub">зелёная отметка — день выполнен</p>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-legend"><span class="dot"></span><span>выполнено</span></div>
+    <button class="sheet-btn ghost" id="calClose" type="button" style="margin-top:16px;">Закрыть</button>
+  </div>
+</div>
+
+<div class="pages-viewport">
+<div class="pages" id="pages">
+
+<div class="page page1">
+<main class="card">
+  <svg class="rings" viewBox="0 0 56 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="21" cy="17" r="12" stroke="#c7a15f" stroke-width="1.6"/>
+    <circle cx="35" cy="17" r="12" stroke="#c7a15f" stroke-width="1.6"/>
+  </svg>
+
+  <p class="eyebrow">Наша свадьба по воле Аллаха</p>
+  <h1 id="dateHeadline">27 ноября 2027</h1>
+  <p class="date-line" id="dateSub">суббота</p>
+
+  <div class="switch" role="group" aria-label="Выбор даты свадьбы">
+    <button type="button" data-date="2027-07-27T00:00:00" id="btnJuly">27 июля</button>
+    <button type="button" data-date="2027-11-27T00:00:00" id="btnNov" class="active">27 ноября</button>
+  </div>
+
+  <div class="clock" id="clock">
+    <div class="unit"><div class="num" id="d">00</div><div class="unit-label">дней</div></div>
+    <div class="sep">:</div>
+    <div class="unit"><div class="num" id="h">00</div><div class="unit-label">часов</div></div>
+    <div class="sep">:</div>
+    <div class="unit"><div class="num" id="m">00</div><div class="unit-label">минут</div></div>
+    <div class="sep">:</div>
+    <div class="unit"><div class="num" id="s">00</div><div class="unit-label">секунд</div></div>
+  </div>
+
+  <div class="rule"></div>
+  <p class="closing" id="closing">до <strong>«да»</strong> осталось совсем немного</p>
+
+  <button id="installBtn" type="button">Установить приложение</button>
+  <p class="hint" id="iosHint" style="display:none;">На iPhone: нажмите «Поделиться» и выберите «На экран «Домой»»</p>
+</main>
+</div>
+
+<div class="page page2">
+<div class="counter-card">
+  <div class="counter-head">
+    <h2>Счётчик зикра</h2>
+    <div class="head-actions">
+      <button class="minus-btn" id="minusBtn" type="button" aria-label="Минус один">−</button>
+      <button class="reset-btn compact" id="resetBtn" type="button" title="Удержите 5 секунд, чтобы обнулить" aria-label="Обнулить">
+        <span class="reset-fill"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 2.64-6.36"></path>
+          <path d="M3 4v5h5"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <p class="counter-hint" id="counterHint">Удержите строку 5 секунд, чтобы выбрать её</p>
+
+  <div class="tasbih-list" id="tasbihList"></div>
+
+  <button class="plus-btn" id="plusBtn" type="button" aria-label="Плюс один">+</button>
+</div>
+</div>
+
+<div class="page page3">
+<div class="counter-card">
+  <button type="button" class="month-title" id="monthTitle">
+    <span id="monthTitleText">Месяц</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4.5" width="18" height="16" rx="2.5"></rect>
+      <path d="M3 9.5h18"></path>
+      <path d="M8 2.5v4"></path>
+      <path d="M16 2.5v4"></path>
+    </svg>
+  </button>
+  <div class="day-strip" id="dayStrip"></div>
+
+  <div class="counter-head">
+    <h2>Счётчик зикра</h2>
+    <div class="head-actions">
+      <button class="minus-btn" id="minusBtn2" type="button" aria-label="Минус один">−</button>
+      <button class="reset-btn compact" id="resetBtn2" type="button" title="Удержите 5 секунд, чтобы обнулить" aria-label="Обнулить">
+        <span class="reset-fill"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 2.64-6.36"></path>
+          <path d="M3 4v5h5"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <p class="counter-hint" id="counterHint2">Удержите строку 5 секунд, чтобы выбрать её</p>
+
+  <div class="tasbih-list" id="tasbihList2"></div>
+
+  <button class="plus-btn" id="plusBtn2" type="button" aria-label="Плюс один">+</button>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="dots">
+  <button class="active" data-page="0" aria-label="Страница 1"></button>
+  <button data-page="1" aria-label="Страница 2"></button>
+  <button data-page="2" aria-label="Страница 3"></button>
+</div>
+
+<script>
+  const state = { target: new Date('2027-11-27T00:00:00') };
+  const els = {
+    d: document.getElementById('d'),
+    h: document.getElementById('h'),
+    m: document.getElementById('m'),
+    s: document.getElementById('s'),
+    headline: document.getElementById('dateHeadline'),
+    sub: document.getElementById('dateSub'),
+    closing: document.getElementById('closing'),
+    btnJuly: document.getElementById('btnJuly'),
+    btnNov: document.getElementById('btnNov'),
+  };
+
+  const RU_HEADLINE = {
+    '2027-07-27T00:00:00': '27 июля 2027',
+    '2027-11-27T00:00:00': '27 ноября 2027',
+  };
+  const RU_WEEKDAY = {
+    '2027-07-27T00:00:00': 'вторник',
+    '2027-11-27T00:00:00': 'суббота',
+  };
+
+  function pad(n){ return String(n).padStart(2, '0'); }
+
+  function setActiveButton(iso){
+    els.btnJuly.classList.toggle('active', iso === els.btnJuly.dataset.date);
+    els.btnNov.classList.toggle('active', iso === els.btnNov.dataset.date);
+  }
+
+  function selectDate(iso){
+    state.target = new Date(iso);
+    els.headline.textContent = RU_HEADLINE[iso];
+    els.sub.textContent = RU_WEEKDAY[iso];
+    setActiveButton(iso);
+    localStorage.setItem('wedding-date', iso);
+    tick();
+  }
+
+  function tick(){
+    const now = new Date();
+    let diff = Math.max(0, state.target - now);
+
+    const day = Math.floor(diff / 86400000);
+    diff -= day * 86400000;
+    const hour = Math.floor(diff / 3600000);
+    diff -= hour * 3600000;
+    const min = Math.floor(diff / 60000);
+    diff -= min * 60000;
+    const sec = Math.floor(diff / 1000);
+
+    els.d.textContent = pad(day);
+    els.h.textContent = pad(hour);
+    els.m.textContent = pad(min);
+    els.s.textContent = pad(sec);
+
+    const totalMs = state.target - now;
+    if (totalMs <= 0){
+      els.closing.innerHTML = 'сегодня мы говорим <strong>«да»</strong> 💍';
+    } else if (day === 0){
+      els.closing.innerHTML = 'до <strong>«да»</strong> остались считанные часы';
+    } else {
+      els.closing.innerHTML = 'до <strong>«да»</strong> осталось совсем немного';
+    }
+  }
+
+  els.btnJuly.addEventListener('click', () => { feedbackToggle(); selectDate(els.btnJuly.dataset.date); });
+  els.btnNov.addEventListener('click', () => { feedbackToggle(); selectDate(els.btnNov.dataset.date); });
+
+  const saved = localStorage.getItem('wedding-date');
+  if (saved && RU_HEADLINE[saved]) {
+    selectDate(saved);
+  } else {
+    selectDate(els.btnNov.dataset.date);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+
+  // --- PWA install prompt ---
+  let deferredPrompt = null;
+  const installBtn = document.getElementById('installBtn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.classList.add('show');
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    feedbackTap();
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBtn.classList.remove('show');
+  });
+
+  window.addEventListener('appinstalled', () => {
+    installBtn.classList.remove('show');
+  });
+
+  // iOS has no beforeinstallprompt — show manual hint
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (isIOS && !isStandalone) {
+    document.getElementById('iosHint').style.display = 'block';
+  }
+
+  // --- 4-digit PIN: lock screen + settings ---
+  const PIN_KEY = 'wedding-pin';
+
+  function getPin(){ return localStorage.getItem(PIN_KEY); }
+  function setPin(v){ localStorage.setItem(PIN_KEY, v); }
+  function clearPin(){ localStorage.removeItem(PIN_KEY); }
+
+  function wirePinRow(row, onComplete){
+    const inputs = Array.from(row.querySelectorAll('input'));
+    inputs.forEach((inp, i) => {
+      inp.addEventListener('input', () => {
+        inp.value = inp.value.replace(/[^0-9]/g, '').slice(0, 1);
+        if (inp.value) {
+          feedbackTap();
+          if (i < inputs.length - 1) inputs[i + 1].focus();
+        }
+        if (inputs.every(x => x.value)) onComplete(inputs.map(x => x.value).join(''));
+      });
+      inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !inp.value && i > 0) inputs[i - 1].focus();
+      });
+    });
+    return {
+      clear(){ inputs.forEach(x => x.value = ''); inputs[0].focus(); },
+      inputs
+    };
+  }
+
+  const lockOverlay = document.getElementById('lockOverlay');
+  const lockError = document.getElementById('lockError');
+  const lockPin = wirePinRow(document.getElementById('lockPinRow'), (val) => {
+    if (val === getPin()) {
+      feedbackConfirm();
+      lockOverlay.classList.remove('show');
+      lockError.textContent = '';
+    } else {
+      feedbackError();
+      lockError.textContent = 'Неверный пароль';
+      lockPin.clear();
+    }
+  });
+
+  if (getPin()) {
+    lockOverlay.classList.add('show');
+    setTimeout(() => lockPin.inputs[0].focus(), 250);
+  }
+
+  // Settings modal
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const gearBtn = document.getElementById('gearBtn');
+  const stepVerify = document.getElementById('stepVerify');
+  const stepMenu = document.getElementById('stepMenu');
+  const stepSetPin = document.getElementById('stepSetPin');
+  const pinStatus = document.getElementById('pinStatus');
+  const removePinBtn = document.getElementById('removePinBtn');
+
+  function showStep(step){
+    [stepVerify, stepMenu, stepSetPin].forEach(s => s.classList.remove('active'));
+    step.classList.add('active');
+  }
+
+  function refreshStatus(){
+    if (getPin()) {
+      pinStatus.innerHTML = 'Пароль <strong>установлен</strong>';
+      removePinBtn.style.display = 'block';
+    } else {
+      pinStatus.textContent = 'Пароль не установлен';
+      removePinBtn.style.display = 'none';
+    }
+    refreshHoldInputs();
+  }
+
+  function openSettings(){
+    refreshStatus();
+    settingsOverlay.classList.add('show');
+    if (getPin()) {
+      showStep(stepVerify);
+      setTimeout(() => verifyPin.inputs[0].focus(), 250);
+    } else {
+      showStep(stepMenu);
+    }
+  }
+
+  function closeSettings(){
+    settingsOverlay.classList.remove('show');
+  }
+
+  gearBtn.addEventListener('click', () => { feedbackTap(); openSettings(); });
+  document.getElementById('menuClose').addEventListener('click', () => { feedbackTap(); closeSettings(); });
+  document.getElementById('verifyCancel').addEventListener('click', () => { feedbackTap(); closeSettings(); });
+  document.getElementById('setPinCancel').addEventListener('click', () => { feedbackTap(); showStep(stepMenu); });
+
+  const verifyError = document.getElementById('verifyError');
+  const verifyPin = wirePinRow(document.getElementById('verifyPinRow'), (val) => {
+    if (val === getPin()) {
+      feedbackConfirm();
+      verifyError.textContent = '';
+      verifyPin.clear();
+      refreshStatus();
+      showStep(stepMenu);
+    } else {
+      feedbackError();
+      verifyError.textContent = 'Неверный пароль';
+      verifyPin.clear();
+    }
+  });
+
+  document.getElementById('setPinBtn').addEventListener('click', () => {
+    feedbackTap();
+    newPin.clear();
+    document.getElementById('newPinError').textContent = '';
+    showStep(stepSetPin);
+    setTimeout(() => newPin.inputs[0].focus(), 250);
+  });
+
+  const newPin = wirePinRow(document.getElementById('newPinRow'), (val) => {
+    setPin(val);
+    feedbackConfirm();
+    refreshStatus();
+    showStep(stepMenu);
+  });
+
+  removePinBtn.addEventListener('click', () => {
+    clearPin();
+    feedbackTap();
+    refreshStatus();
+    showStep(stepMenu);
+  });
+
+  settingsOverlay.addEventListener('click', (e) => {
+    if (e.target === settingsOverlay) closeSettings();
+  });
+
+  // --- Sound + vibration feedback ---
+  let audioCtx = null;
+  function getAudioCtx(){
+    if (!audioCtx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (Ctx) audioCtx = new Ctx();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  // Unlock audio on first touch (autoplay policies)
+  document.addEventListener('touchstart', () => getAudioCtx(), { once: true, passive: true });
+  document.addEventListener('pointerdown', () => getAudioCtx(), { once: true });
+
+  function tone(freq, start, duration, opts = {}){
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = opts.type || 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+    if (opts.slideTo) {
+      osc.frequency.linearRampToValueAtTime(opts.slideTo, ctx.currentTime + start + duration);
+    }
+    const peak = opts.volume ?? 0.18;
+    gain.gain.setValueAtTime(0, ctx.currentTime + start);
+    gain.gain.linearRampToValueAtTime(peak, ctx.currentTime + start + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + start + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime + start);
+    osc.stop(ctx.currentTime + start + duration + 0.02);
+  }
+
+  function vibrate(pattern){
+    if (navigator.vibrate) navigator.vibrate(pattern);
+  }
+
+  // Soft tick — tap on "+"
+  function feedbackPlus(){
+    tone(720, 0, 0.07, { type: 'sine', volume: 0.16 });
+    vibrate(12);
+  }
+
+  // Warm rising chime — a zikr row gets selected
+  function feedbackSelect(){
+    tone(660, 0, 0.11, { type: 'sine', volume: 0.16 });
+    tone(880, 0.09, 0.16, { type: 'sine', volume: 0.18 });
+    vibrate([25, 35, 25]);
+  }
+
+  // Descending tone — counter reset
+  function feedbackReset(){
+    tone(500, 0, 0.16, { type: 'triangle', volume: 0.16, slideTo: 260 });
+    vibrate([40, 60, 40, 60, 90]);
+  }
+
+  // Lower soft tick — tap on "−"
+  function feedbackMinus(){
+    tone(480, 0, 0.07, { type: 'sine', volume: 0.15 });
+    vibrate(12);
+  }
+
+  // Neutral light tick — generic buttons: open/close, cancel, edit, icons
+  function feedbackTap(){
+    tone(600, 0, 0.05, { type: 'sine', volume: 0.12 });
+    vibrate(8);
+  }
+
+  // Gentle two-note switch — toggles/selections: date switch, day view, calendar day
+  function feedbackToggle(){
+    tone(700, 0, 0.06, { type: 'sine', volume: 0.14 });
+    tone(850, 0.05, 0.07, { type: 'sine', volume: 0.13 });
+    vibrate(10);
+  }
+
+  // Bright confirm — save actions: PIN set, settings saved, hold times saved
+  function feedbackConfirm(){
+    tone(700, 0, 0.08, { type: 'sine', volume: 0.16 });
+    tone(950, 0.07, 0.13, { type: 'sine', volume: 0.17 });
+    vibrate([15, 20, 15]);
+  }
+
+  // Harsh low buzz — wrong PIN / error
+  function feedbackError(){
+    tone(300, 0, 0.12, { type: 'square', volume: 0.1 });
+    tone(220, 0.1, 0.16, { type: 'square', volume: 0.1 });
+    vibrate([30, 40, 30, 40, 30]);
+  }
+
+  // --- Configurable hold times (long-press durations) ---
+  const HOLD_KEY = 'wedding-hold-times';
+  function loadHoldTimes(){
+    try {
+      const raw = JSON.parse(localStorage.getItem(HOLD_KEY));
+      if (raw && typeof raw.row === 'number' && typeof raw.reset === 'number' && typeof raw.day === 'number') {
+        if (typeof raw.settings !== 'number') raw.settings = 1;
+        return raw;
+      }
+    } catch (e) {}
+    return { row: 5, reset: 5, day: 1, settings: 1 }; // seconds — matches current defaults
+  }
+  let holdTimes = loadHoldTimes();
+  function saveHoldTimes(){ localStorage.setItem(HOLD_KEY, JSON.stringify(holdTimes)); }
+
+  function refreshHoldInputs(){
+    document.getElementById('holdRowInput').value = holdTimes.row;
+    document.getElementById('holdResetInput').value = holdTimes.reset;
+    document.getElementById('holdDayInput').value = holdTimes.day;
+    document.getElementById('holdSettingsInput').value = holdTimes.settings;
+  }
+
+  document.getElementById('holdTimesSave').addEventListener('click', () => {
+    const row = Math.max(0.5, parseFloat(document.getElementById('holdRowInput').value) || holdTimes.row);
+    const reset = Math.max(0.5, parseFloat(document.getElementById('holdResetInput').value) || holdTimes.reset);
+    const day = Math.max(0.5, parseFloat(document.getElementById('holdDayInput').value) || holdTimes.day);
+    const settings = Math.max(0.5, parseFloat(document.getElementById('holdSettingsInput').value) || holdTimes.settings);
+    holdTimes = { row, reset, day, settings };
+    saveHoldTimes();
+    feedbackConfirm();
+    refreshHoldInputs();
+  });
+
+  // --- Secret cheat code: reveal/hide the wedding countdown page ---
+  const PAGE1_KEY = 'wedding-page1-visible';
+  const CHEAT_PHRASE = 'идрис+амина';
+  function loadPage1Visible(){
+    const v = localStorage.getItem(PAGE1_KEY);
+    return v === 'true'; // default: hidden
+  }
+  let page1Visible = loadPage1Visible();
+
+  document.getElementById('cheatInput').addEventListener('input', (e) => {
+    if (e.target.value.trim().toLowerCase() === CHEAT_PHRASE) {
+      togglePage1();
+      vibrate([15, 25, 15, 25, 15]);
+      e.target.value = '';
+    }
+  });
+
+  function startFill(el, ms){
+    el.style.transition = 'none';
+    el.style.width = '0%';
+    // force reflow so the browser registers the reset before animating
+    void el.offsetWidth;
+    requestAnimationFrame(() => {
+      el.style.transition = `width ${ms}ms linear`;
+      el.style.width = '100%';
+    });
+  }
+  function stopFill(el){
+    el.style.transition = 'none';
+    el.style.width = '0%';
+  }
+
+  // --- Swipe between pages (page1 can be hidden/shown via cheat code) ---
+  const pagesEl = document.getElementById('pages');
+  const dotsContainer = document.querySelector('.dots');
+  const page1El = document.querySelector('.page1');
+  const hiddenStash = document.createElement('div');
+  hiddenStash.style.display = 'none';
+  document.body.appendChild(hiddenStash);
+
+  let currentPage = 0;
+  let startX = 0, currentX = 0, dragging = false, viewportW = window.innerWidth;
+
+  function pageCount(){ return pagesEl.children.length; }
+
+  function rebuildDots(){
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < pageCount(); i++){
+      const b = document.createElement('button');
+      b.dataset.page = String(i);
+      dotsContainer.appendChild(b);
+    }
+    updateDotsActive();
+  }
+
+  function updateDotsActive(){
+    Array.from(dotsContainer.children).forEach((d, i) => d.classList.toggle('active', i === currentPage));
+  }
+
+  function setPage(index, animate = true){
+    currentPage = Math.max(0, Math.min(index, pageCount() - 1));
+    pagesEl.style.transition = animate ? '' : 'none';
+    pagesEl.style.transform = `translateX(-${currentPage * viewportW}px)`;
+    updateDotsActive();
+    if (!animate) requestAnimationFrame(() => { pagesEl.style.transition = ''; });
+  }
+
+  // Dots are indicator-only — navigation is swipe left/right exclusively.
+
+  window.addEventListener('resize', () => {
+    viewportW = window.innerWidth;
+    setPage(currentPage, false);
+  });
+
+  pagesEl.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    currentX = startX;
+    dragging = true;
+    pagesEl.classList.add('dragging');
+  }, { passive: true });
+
+  pagesEl.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    currentX = e.touches[0].clientX;
+    const delta = currentX - startX;
+    const base = -currentPage * viewportW;
+    pagesEl.style.transform = `translateX(${base + delta}px)`;
+  }, { passive: true });
+
+  pagesEl.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    pagesEl.classList.remove('dragging');
+    const delta = currentX - startX;
+    if (delta < -60 && currentPage < pageCount() - 1) setPage(currentPage + 1);
+    else if (delta > 60 && currentPage > 0) setPage(currentPage - 1);
+    else setPage(currentPage);
+  });
+
+  function togglePage1(){
+    if (page1Visible) {
+      if (pagesEl.contains(page1El)) hiddenStash.appendChild(page1El);
+      currentPage = Math.max(0, currentPage - 1);
+    } else {
+      pagesEl.insertBefore(page1El, pagesEl.firstChild);
+      currentPage = currentPage + 1;
+    }
+    page1Visible = !page1Visible;
+    localStorage.setItem(PAGE1_KEY, String(page1Visible));
+    rebuildDots();
+    setPage(currentPage, false);
+  }
+
+  // Apply initial visibility (hidden by default) before first render
+  if (!page1Visible) hiddenStash.appendChild(page1El);
+  rebuildDots();
+  setPage(0, false);
+
+  // --- Dhikr / tasbih counter (page 2) ---
+  const TASBIH_KEY = 'wedding-tasbih';
+  const DEFAULT_ROWS = [
+    { name: 'СубханАллах', count: 0 },
+    { name: 'Альхамдулиллях', count: 0 },
+    { name: 'Аллаху Акбар', count: 0 },
+    { name: 'Ля иляха илля Ллах', count: 0 },
+    { name: 'Астагфируллах', count: 0 },
+  ];
+
+  function loadTasbih(){
+    try {
+      const raw = JSON.parse(localStorage.getItem(TASBIH_KEY));
+      if (Array.isArray(raw) && raw.length === 5) return raw;
+    } catch (e) {}
+    return DEFAULT_ROWS.map(r => ({ ...r }));
+  }
+
+  const tasbih = { rows: loadTasbih(), selected: null };
+
+  function saveTasbih(){
+    localStorage.setItem(TASBIH_KEY, JSON.stringify(tasbih.rows));
+  }
+
+  const tasbihList = document.getElementById('tasbihList');
+  const counterHint = document.getElementById('counterHint');
+
+  function updateHint(){
+    if (tasbih.selected === null) {
+      counterHint.innerHTML = 'Удержите строку 5 секунд, чтобы выбрать её';
+    } else {
+      counterHint.innerHTML = `Активна: <strong>${tasbih.rows[tasbih.selected].name}</strong>`;
+    }
+  }
+
+  function renderTasbih(){
+    tasbihList.innerHTML = '';
+    tasbih.rows.forEach((row, i) => {
+      const el = document.createElement('div');
+      el.className = 'tasbih-row' + (tasbih.selected === i ? ' selected' : '');
+      el.dataset.index = String(i);
+      el.innerHTML = `
+        <div class="row-progress"></div>
+        <div class="row-main">
+          <span class="row-name">${row.name}</span>
+        </div>
+        <span class="row-count">${row.count}</span>
+        <button class="row-edit" type="button" aria-label="Изменить название">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+          </svg>
+        </button>`;
+      tasbihList.appendChild(el);
+      wireRowSelect(el, i);
+      el.querySelector('.row-edit').addEventListener('click', (e) => {
+        e.stopPropagation();
+        feedbackTap();
+        startRename(el, i);
+      });
+    });
+    updateHint();
+  }
+
+  function startRename(rowEl, i){
+    const nameSpan = rowEl.querySelector('.row-name');
+    const input = document.createElement('input');
+    input.className = 'row-name-input';
+    input.value = tasbih.rows[i].name;
+    input.maxLength = 30;
+    nameSpan.replaceWith(input);
+    input.focus();
+    input.select();
+
+    function commit(){
+      const val = input.value.trim();
+      tasbih.rows[i].name = val || tasbih.rows[i].name;
+      saveTasbih();
+      renderTasbih();
+    }
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') input.blur();
+    });
+    input.addEventListener('blur', commit);
+    input.addEventListener('click', (e) => e.stopPropagation());
+  }
+
+  function wireRowSelect(el, i){
+    let holdTimer = null;
+    let held = false;
+
+    function start(e){
+      if (e.target.closest('.row-edit')) return;
+      held = false;
+      el.classList.add('pressing');
+      startFill(el.querySelector('.row-progress'), holdTimes.row * 1000);
+      holdTimer = setTimeout(() => {
+        held = true;
+        tasbih.selected = i;
+        saveTasbih();
+        renderTasbih();
+        feedbackSelect();
+        const fresh = tasbihList.children[i];
+        if (fresh) fresh.classList.add('just-selected');
+      }, holdTimes.row * 1000);
+    }
+
+    function cancel(){
+      clearTimeout(holdTimer);
+      el.classList.remove('pressing');
+      stopFill(el.querySelector('.row-progress'));
+    }
+
+    el.addEventListener('pointerdown', start);
+    el.addEventListener('pointerup', cancel);
+    el.addEventListener('pointerleave', cancel);
+    el.addEventListener('pointercancel', cancel);
+    el.addEventListener('contextmenu', (e) => e.preventDefault());
+  }
+
+  document.getElementById('plusBtn').addEventListener('click', () => {
+    if (tasbih.selected === null) {
+      counterHint.innerHTML = 'Сначала выберите строку — удержите её 5 секунд';
+      return;
+    }
+    tasbih.rows[tasbih.selected].count += 1;
+    saveTasbih();
+    feedbackPlus();
+    const rowEl = tasbihList.children[tasbih.selected];
+    if (rowEl) rowEl.querySelector('.row-count').textContent = tasbih.rows[tasbih.selected].count;
+  });
+
+  document.getElementById('minusBtn').addEventListener('click', () => {
+    if (tasbih.selected === null) return;
+    tasbih.rows[tasbih.selected].count = Math.max(0, tasbih.rows[tasbih.selected].count - 1);
+    saveTasbih();
+    feedbackMinus();
+    const rowEl = tasbihList.children[tasbih.selected];
+    if (rowEl) rowEl.querySelector('.row-count').textContent = tasbih.rows[tasbih.selected].count;
+  });
+
+  const resetBtn = document.getElementById('resetBtn');
+  let resetTimer = null;
+
+  function resetStart(){
+    if (tasbih.selected === null) return;
+    resetBtn.classList.add('pressing');
+    startFill(resetBtn.querySelector('.reset-fill'), holdTimes.reset * 1000);
+    const rowEl = tasbihList.children[tasbih.selected];
+    if (rowEl) { rowEl.classList.add('reset-pressing'); startFill(rowEl.querySelector('.row-progress'), holdTimes.reset * 1000); }
+    resetTimer = setTimeout(() => {
+      tasbih.rows[tasbih.selected].count = 0;
+      saveTasbih();
+      renderTasbih();
+      feedbackReset();
+      const fresh = tasbihList.children[tasbih.selected];
+      if (fresh) fresh.classList.add('just-reset');
+      resetBtn.classList.remove('pressing');
+    }, holdTimes.reset * 1000);
+  }
+
+  function resetCancel(){
+    clearTimeout(resetTimer);
+    resetBtn.classList.remove('pressing');
+    stopFill(resetBtn.querySelector('.reset-fill'));
+    const rowEl = tasbih.selected !== null ? tasbihList.children[tasbih.selected] : null;
+    if (rowEl) { rowEl.classList.remove('reset-pressing'); stopFill(rowEl.querySelector('.row-progress')); }
+  }
+
+  resetBtn.addEventListener('pointerdown', resetStart);
+  resetBtn.addEventListener('pointerup', resetCancel);
+  resetBtn.addEventListener('pointerleave', resetCancel);
+  resetBtn.addEventListener('pointercancel', resetCancel);
+
+  renderTasbih();
+
+  // --- Page 3: daily dhikr counter with month/day picker ---
+  const DAILY_KEY = 'wedding-tasbih-daily';
+
+  function defaultRowSettings(){
+    return { goal: 33, mode: 'normal', step: 1 };
+  }
+
+  function loadDaily(){
+    try {
+      const raw = JSON.parse(localStorage.getItem(DAILY_KEY));
+      if (raw && Array.isArray(raw.names) && raw.names.length === 5 && raw.counts) {
+        if (!Array.isArray(raw.settings) || raw.settings.length !== 5) {
+          raw.settings = raw.names.map(() => defaultRowSettings());
+        }
+        return raw;
+      }
+    } catch (e) {}
+    return { names: DEFAULT_ROWS.map(r => r.name), counts: {}, settings: DEFAULT_ROWS.map(() => defaultRowSettings()) };
+  }
+
+  const daily = loadDaily();
+  daily.selectedRow = null;
+
+  const now = new Date();
+  const monthIndex = now.getMonth();
+  const daysInMonth = new Date(now.getFullYear(), monthIndex + 1, 0).getDate();
+  const todayDate = now.getDate();
+  let activeDay = (daily.lastSelectedDay && daily.lastSelectedDay <= daysInMonth) ? daily.lastSelectedDay : todayDate;
+  let viewDay = activeDay;
+
+  function saveDaily(){
+    localStorage.setItem(DAILY_KEY, JSON.stringify({ names: daily.names, counts: daily.counts, settings: daily.settings, lastSelectedDay: activeDay }));
+  }
+
+  function getDayCounts(day){
+    if (!daily.counts[day]) daily.counts[day] = [0, 0, 0, 0, 0];
+    return daily.counts[day];
+  }
+
+  function renderMonthTitle(){
+    const title = now.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+    document.getElementById('monthTitleText').textContent = title.charAt(0).toUpperCase() + title.slice(1);
+  }
+
+  function renderDayStrip(){
+    const strip = document.getElementById('dayStrip');
+    strip.innerHTML = '';
+    for (let day = 1; day <= daysInMonth; day++){
+      const btn = document.createElement('button');
+      btn.className = 'day-pill'
+        + (day === activeDay ? ' active-day' : '')
+        + (day === viewDay && day !== activeDay ? ' viewing' : '')
+        + (day === todayDate ? ' today' : '');
+      btn.type = 'button';
+      btn.innerHTML = `<span class="day-fill"></span><span class="day-num">${day}</span>`;
+      wireDaySelect(btn, day);
+      strip.appendChild(btn);
+    }
+    requestAnimationFrame(() => {
+      const sel = strip.querySelector('.day-pill.active-day') || strip.querySelector('.day-pill.viewing');
+      if (sel) sel.scrollIntoView({ inline: 'center', block: 'nearest' });
+    });
+  }
+
+  function wireDaySelect(btn, day){
+    let holdTimer = null;
+    let activated = false;
+    function start(){
+      activated = false;
+      btn.classList.add('pressing');
+      startFill(btn.querySelector('.day-fill'), holdTimes.day * 1000);
+      holdTimer = setTimeout(() => {
+        activated = true;
+        activeDay = day;
+        viewDay = day;
+        saveDaily();
+        feedbackSelect();
+        renderDayStrip();
+        renderTasbih2();
+      }, holdTimes.day * 1000);
+    }
+    function release(){
+      clearTimeout(holdTimer);
+      btn.classList.remove('pressing');
+      stopFill(btn.querySelector('.day-fill'));
+      if (!activated) {
+        // quick tap — just show this day's dhikr, don't change the active day
+        viewDay = day;
+        feedbackToggle();
+        renderDayStrip();
+        renderTasbih2();
+      }
+    }
+    function cancel(){
+      clearTimeout(holdTimer);
+      btn.classList.remove('pressing');
+      stopFill(btn.querySelector('.day-fill'));
+    }
+    btn.addEventListener('pointerdown', start);
+    btn.addEventListener('pointerup', release);
+    btn.addEventListener('pointerleave', cancel);
+    btn.addEventListener('pointercancel', cancel);
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
+  }
+
+  const tasbihList2 = document.getElementById('tasbihList2');
+  const counterHint2 = document.getElementById('counterHint2');
+
+  function updateHint2(){
+    if (viewDay !== activeDay) {
+      counterHint2.innerHTML = `Показан день <strong>${viewDay}</strong> · дхикр пишется в день <strong>${activeDay}</strong>`;
+    } else if (daily.selectedRow === null) {
+      counterHint2.innerHTML = 'Удержите строку 5 секунд, чтобы выбрать её';
+    } else {
+      counterHint2.innerHTML = `Активна: <strong>${daily.names[daily.selectedRow]}</strong>`;
+    }
+  }
+
+  function displayValue(i, rawCount){
+    const s = daily.settings[i];
+    if (s.mode === 'reverse' && s.goal > 0) return Math.max(s.goal - rawCount, 0);
+    return rawCount;
+  }
+
+  function renderTasbih2(){
+    const counts = getDayCounts(viewDay);
+    tasbihList2.innerHTML = '';
+    daily.names.forEach((name, i) => {
+      const s = daily.settings[i];
+      const val = displayValue(i, counts[i]);
+      const meta = `${s.mode === 'reverse' ? 'обратный' : 'обычный'} · шаг ${s.step}${s.goal > 0 ? ' · цель ' + s.goal : ''}`;
+      const el = document.createElement('div');
+      el.className = 'tasbih-row' + (daily.selectedRow === i ? ' selected' : '');
+      el.dataset.index = String(i);
+      el.innerHTML = `
+        <div class="row-progress"></div>
+        <div class="row-main">
+          <span class="row-name">${name}</span>
+          <span class="row-meta">${meta}</span>
+        </div>
+        <span class="row-count">${val}</span>
+        <button class="row-settings" type="button" aria-label="Настройки счётчика">
+          <span class="row-settings-fill"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="2.6"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.13.42.4.79.76 1.05.36.26.79.4 1.24.4H21.5a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+        <button class="row-edit" type="button" aria-label="Изменить название">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+          </svg>
+        </button>`;
+      tasbihList2.appendChild(el);
+      wireRowSelect2(el, i);
+      el.querySelector('.row-edit').addEventListener('click', (e) => { e.stopPropagation(); feedbackTap(); startRename2(el, i); });
+      wireRowSettingsHold(el.querySelector('.row-settings'), i);
+    });
+    updateHint2();
+  }
+
+  function startRename2(rowEl, i){
+    const nameSpan = rowEl.querySelector('.row-name');
+    const input = document.createElement('input');
+    input.className = 'row-name-input';
+    input.value = daily.names[i];
+    input.maxLength = 30;
+    nameSpan.replaceWith(input);
+    input.focus();
+    input.select();
+    function commit(){
+      const val = input.value.trim();
+      daily.names[i] = val || daily.names[i];
+      saveDaily();
+      renderTasbih2();
+    }
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') input.blur(); });
+    input.addEventListener('blur', commit);
+    input.addEventListener('click', (e) => e.stopPropagation());
+  }
+
+  function wireRowSettingsHold(btn, i){
+    let holdTimer = null;
+    function start(e){
+      e.stopPropagation();
+      startFill(btn.querySelector('.row-settings-fill'), holdTimes.settings * 1000);
+      holdTimer = setTimeout(() => {
+        stopFill(btn.querySelector('.row-settings-fill'));
+        feedbackToggle();
+        openRowSettings(i);
+      }, holdTimes.settings * 1000);
+    }
+    function cancel(e){
+      if (e) e.stopPropagation();
+      clearTimeout(holdTimer);
+      stopFill(btn.querySelector('.row-settings-fill'));
+    }
+    btn.addEventListener('pointerdown', start);
+    btn.addEventListener('pointerup', cancel);
+    btn.addEventListener('pointerleave', cancel);
+    btn.addEventListener('pointercancel', cancel);
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
+  }
+
+  function wireRowSelect2(el, i){
+    let holdTimer = null;
+    function start(e){
+      if (e.target.closest('.row-edit, .row-settings')) return;
+      el.classList.add('pressing');
+      startFill(el.querySelector('.row-progress'), holdTimes.row * 1000);
+      holdTimer = setTimeout(() => {
+        daily.selectedRow = i;
+        saveDaily();
+        renderTasbih2();
+        feedbackSelect();
+        const fresh = tasbihList2.children[i];
+        if (fresh) fresh.classList.add('just-selected');
+      }, holdTimes.row * 1000);
+    }
+    function cancel(){ clearTimeout(holdTimer); el.classList.remove('pressing'); stopFill(el.querySelector('.row-progress')); }
+    el.addEventListener('pointerdown', start);
+    el.addEventListener('pointerup', cancel);
+    el.addEventListener('pointerleave', cancel);
+    el.addEventListener('pointercancel', cancel);
+    el.addEventListener('contextmenu', (e) => e.preventDefault());
+  }
+
+  document.getElementById('plusBtn2').addEventListener('click', () => {
+    if (daily.selectedRow === null) { counterHint2.innerHTML = 'Сначала выберите строку — удержите её 5 секунд'; return; }
+    const i = daily.selectedRow;
+    const step = daily.settings[i].step || 1;
+    const counts = getDayCounts(activeDay);
+    counts[i] += step;
+    viewDay = activeDay;
+    saveDaily();
+    feedbackPlus();
+    renderDayStrip();
+    renderTasbih2();
+  });
+
+  document.getElementById('minusBtn2').addEventListener('click', () => {
+    if (daily.selectedRow === null) return;
+    const i = daily.selectedRow;
+    const step = daily.settings[i].step || 1;
+    const counts = getDayCounts(activeDay);
+    counts[i] = Math.max(0, counts[i] - step);
+    viewDay = activeDay;
+    saveDaily();
+    feedbackMinus();
+    renderDayStrip();
+    renderTasbih2();
+  });
+
+  const resetBtn2 = document.getElementById('resetBtn2');
+  let resetTimer2 = null;
+  function resetStart2(){
+    if (daily.selectedRow === null) return;
+    resetBtn2.classList.add('pressing');
+    startFill(resetBtn2.querySelector('.reset-fill'), holdTimes.reset * 1000);
+    const rowEl = tasbihList2.children[daily.selectedRow];
+    if (rowEl) { rowEl.classList.add('reset-pressing'); startFill(rowEl.querySelector('.row-progress'), holdTimes.reset * 1000); }
+    resetTimer2 = setTimeout(() => {
+      const counts = getDayCounts(activeDay);
+      counts[daily.selectedRow] = 0;
+      viewDay = activeDay;
+      saveDaily();
+      renderDayStrip();
+      renderTasbih2();
+      feedbackReset();
+      const fresh = tasbihList2.children[daily.selectedRow];
+      if (fresh) fresh.classList.add('just-reset');
+      resetBtn2.classList.remove('pressing');
+    }, holdTimes.reset * 1000);
+  }
+  function resetCancel2(){
+    clearTimeout(resetTimer2);
+    resetBtn2.classList.remove('pressing');
+    stopFill(resetBtn2.querySelector('.reset-fill'));
+    const rowEl = daily.selectedRow !== null ? tasbihList2.children[daily.selectedRow] : null;
+    if (rowEl) { rowEl.classList.remove('reset-pressing'); stopFill(rowEl.querySelector('.row-progress')); }
+  }
+  resetBtn2.addEventListener('pointerdown', resetStart2);
+  resetBtn2.addEventListener('pointerup', resetCancel2);
+  resetBtn2.addEventListener('pointerleave', resetCancel2);
+  resetBtn2.addEventListener('pointercancel', resetCancel2);
+
+  // --- Row settings modal (goal / mode / step) ---
+  const rowSettingsOverlay = document.getElementById('rowSettingsOverlay');
+  const rowSettingsTitle = document.getElementById('rowSettingsTitle');
+  const goalInput = document.getElementById('goalInput');
+  const stepInput = document.getElementById('stepInput');
+  const modeNormalBtn = document.getElementById('modeNormalBtn');
+  const modeReverseBtn = document.getElementById('modeReverseBtn');
+  let editingRowIndex = null;
+  let editingMode = 'normal';
+
+  function openRowSettings(i){
+    editingRowIndex = i;
+    const s = daily.settings[i];
+    editingMode = s.mode;
+    rowSettingsTitle.textContent = `Настройки: ${daily.names[i]}`;
+    goalInput.value = s.goal;
+    stepInput.value = s.step;
+    modeNormalBtn.classList.toggle('active', editingMode === 'normal');
+    modeReverseBtn.classList.toggle('active', editingMode === 'reverse');
+    rowSettingsOverlay.classList.add('show');
+  }
+
+  function closeRowSettings(){
+    rowSettingsOverlay.classList.remove('show');
+    editingRowIndex = null;
+  }
+
+  modeNormalBtn.addEventListener('click', () => {
+    feedbackTap();
+    editingMode = 'normal';
+    modeNormalBtn.classList.add('active');
+    modeReverseBtn.classList.remove('active');
+  });
+
+  modeReverseBtn.addEventListener('click', () => {
+    feedbackTap();
+    editingMode = 'reverse';
+    modeReverseBtn.classList.add('active');
+    modeNormalBtn.classList.remove('active');
+  });
+
+  document.getElementById('rowSettingsSave').addEventListener('click', () => {
+    if (editingRowIndex === null) return;
+    const goal = Math.max(0, parseInt(goalInput.value, 10) || 0);
+    const step = Math.max(1, parseInt(stepInput.value, 10) || 1);
+    daily.settings[editingRowIndex] = { goal, mode: editingMode, step };
+    saveDaily();
+    feedbackConfirm();
+    renderTasbih2();
+    closeRowSettings();
+  });
+
+  document.getElementById('rowSettingsCancel').addEventListener('click', () => { feedbackTap(); closeRowSettings(); });
+  rowSettingsOverlay.addEventListener('click', (e) => { if (e.target === rowSettingsOverlay) closeRowSettings(); });
+
+  // --- Month calendar modal (completed-day overview) ---
+  const monthCalendarOverlay = document.getElementById('monthCalendarOverlay');
+  const calGrid = document.getElementById('calGrid');
+  const DOW_LABELS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+
+  function isDayCompleted(day){
+    const counts = daily.counts[day];
+    if (!counts) return false;
+    const goalsSet = daily.settings.filter(s => s.goal > 0);
+    if (goalsSet.length === 0) return false;
+    return daily.settings.every((s, i) => s.goal === 0 || (counts[i] || 0) >= s.goal);
+  }
+
+  function renderMonthCalendar(){
+    const title = now.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+    document.getElementById('calTitle').textContent = title.charAt(0).toUpperCase() + title.slice(1);
+
+    calGrid.innerHTML = '';
+    DOW_LABELS.forEach(l => {
+      const el = document.createElement('div');
+      el.className = 'cal-dow';
+      el.textContent = l;
+      calGrid.appendChild(el);
+    });
+
+    const firstWeekday = (new Date(now.getFullYear(), monthIndex, 1).getDay() + 6) % 7;
+    for (let k = 0; k < firstWeekday; k++){
+      const empty = document.createElement('div');
+      empty.className = 'cal-day empty';
+      calGrid.appendChild(empty);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++){
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      const done = isDayCompleted(day);
+      cell.className = 'cal-day'
+        + (done ? ' done' : '')
+        + (day === todayDate ? ' today' : '')
+        + (day === activeDay ? ' cal-active' : '');
+      cell.innerHTML = `${day}` + (done ? `<span class="cal-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 12l5 5L20 6"></path></svg></span>` : '');
+      cell.addEventListener('click', () => {
+        viewDay = day;
+        feedbackToggle();
+        renderDayStrip();
+        renderTasbih2();
+        closeMonthCalendar();
+      });
+      calGrid.appendChild(cell);
+    }
+  }
+
+  function openMonthCalendar(){
+    renderMonthCalendar();
+    monthCalendarOverlay.classList.add('show');
+  }
+
+  function closeMonthCalendar(){
+    monthCalendarOverlay.classList.remove('show');
+  }
+
+  document.getElementById('monthTitle').addEventListener('click', () => { feedbackTap(); openMonthCalendar(); });
+  document.getElementById('calClose').addEventListener('click', () => { feedbackTap(); closeMonthCalendar(); });
+  monthCalendarOverlay.addEventListener('click', (e) => { if (e.target === monthCalendarOverlay) closeMonthCalendar(); });
+
+  renderMonthTitle();
+  renderDayStrip();
+  renderTasbih2();
+
+  // --- Service worker for offline + installability ---
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
