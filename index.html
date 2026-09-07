@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
-<title>До нашей свадьбы</title>
+<title>ZIKR</title>
 <meta name="description" content="Отсчёт времени до свадьбы" />
 <meta name="format-detection" content="telephone=no" />
 <link rel="manifest" href="manifest.json" />
@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Свадьба" />
-<meta name="application-name" content="Свадьба" />
+<meta name="apple-mobile-web-app-title" content="ZIKR" />
+<meta name="application-name" content="ZIKR" />
 <link rel="icon" href="icons/icon-192.png" />
 <style>
   :root{
@@ -450,6 +450,8 @@
     opacity:0;
     pointer-events:none;
     transition: opacity 220ms ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .overlay.show{
@@ -460,6 +462,10 @@
   .sheet{
     width:100%;
     max-width: 360px;
+    max-height: calc(100dvh - 48px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: auto;
     background: linear-gradient(180deg, #171f33 0%, #10162578 100%), var(--ink-2);
     border: 1px solid var(--line);
     border-radius: 20px;
@@ -1465,6 +1471,16 @@
           <path d="M3 4v5h5"></path>
         </svg>
       </button>
+      <button class="reset-btn compact" id="resetAllBtn" type="button" title="Удержите 5 секунд, чтобы обнулить все зикры" aria-label="Обнулить все">
+        <span class="reset-fill"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18"></path>
+          <path d="M8 6V4.5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1V6"></path>
+          <path d="M5 6l1 13.5a1.5 1.5 0 0 0 1.5 1.5h9a1.5 1.5 0 0 0 1.5-1.5L19 6"></path>
+          <path d="M10 10.5v6"></path>
+          <path d="M14 10.5v6"></path>
+        </svg>
+      </button>
     </div>
   </div>
   <p class="counter-hint" id="counterHint">Удержите строку 5 секунд, чтобы выбрать её</p>
@@ -2342,6 +2358,35 @@
   resetBtn.addEventListener('pointerup', resetCancel);
   resetBtn.addEventListener('pointerleave', resetCancel);
   resetBtn.addEventListener('pointercancel', resetCancel);
+  resetBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // --- Reset ALL zikrs on this page (separate hold-to-confirm button) ---
+  const resetAllBtn = document.getElementById('resetAllBtn');
+  let resetAllTimer = null;
+
+  function resetAllStart(){
+    resetAllBtn.classList.add('pressing');
+    startFill(resetAllBtn.querySelector('.reset-fill'), holdTimes.reset * 1000);
+    resetAllTimer = setTimeout(() => {
+      tasbih.rows.forEach(row => { row.count = 0; });
+      saveTasbih();
+      renderTasbih();
+      feedbackReset();
+      resetAllBtn.classList.remove('pressing');
+    }, holdTimes.reset * 1000);
+  }
+
+  function resetAllCancel(){
+    clearTimeout(resetAllTimer);
+    resetAllBtn.classList.remove('pressing');
+    stopFill(resetAllBtn.querySelector('.reset-fill'));
+  }
+
+  resetAllBtn.addEventListener('pointerdown', resetAllStart);
+  resetAllBtn.addEventListener('pointerup', resetAllCancel);
+  resetAllBtn.addEventListener('pointerleave', resetAllCancel);
+  resetAllBtn.addEventListener('pointercancel', resetAllCancel);
+  resetAllBtn.addEventListener('contextmenu', (e) => e.preventDefault());
 
   renderTasbih();
 
