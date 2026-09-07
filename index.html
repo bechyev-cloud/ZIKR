@@ -2,18 +2,20 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
 <title>До нашей свадьбы</title>
 <meta name="description" content="Отсчёт времени до свадьбы" />
+<meta name="format-detection" content="telephone=no" />
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#111827" />
-<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<meta name="theme-color" content="#fbf1de" id="themeColorMeta" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Свадьба" />
+<meta name="application-name" content="Свадьба" />
 <link rel="icon" href="icons/icon-192.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,340;0,9..144,500;1,9..144,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink-1: #0b0f1a;
@@ -24,7 +26,104 @@
     --gold-soft: rgba(199,161,95,0.35);
     --rose: #cf9f97;
     --line: rgba(244,237,225,0.14);
+    --bubble-bg: rgba(255,255,255,0.05);
+    --bubble-shadow: none;
+    --bubble-blur: none;
+    --font-serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   }
+
+  :root[data-theme="light"]{
+    --ink-1: #f6ecda;
+    --ink-2: #fffdf9;
+    --cream: #362c22;
+    --cream-dim: #8c8071;
+    --gold: #bd8a3d;
+    --gold-soft: rgba(189,138,61,0.28);
+    --rose: #cd8e83;
+    --line: rgba(189,138,61,0.22);
+    --bubble-bg: radial-gradient(circle at 24% 20%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.85) 38%, rgba(255,250,240,0.62) 72%, rgba(250,240,222,0.45) 100%);
+    --bubble-shadow: 0 5px 16px rgba(150,115,60,0.14), inset 0 1px 1px rgba(255,255,255,0.95);
+    --bubble-blur: blur(12px);
+    --pattern: radial-gradient(circle at 10% 12%, rgba(189,138,61,0.10), transparent 42%), radial-gradient(circle at 90% 8%, rgba(205,142,131,0.09), transparent 46%), repeating-linear-gradient(45deg, rgba(189,138,61,0.035) 0 1.5px, transparent 1.5px 16px);
+  }
+
+  :root[data-theme="light"] body{
+    background: radial-gradient(120% 90% at 50% -10%, #fffefb 0%, #fbf1de 45%, #f6e6c8 100%);
+  }
+
+  :root[data-theme="light"] .veil{
+    opacity:0.35;
+  }
+
+  /* Every card, control, and pill becomes a glossy white bubble floating on the beige page */
+  :root[data-theme="light"] .plus-btn,
+  :root[data-theme="light"] .minus-btn,
+  :root[data-theme="light"] .reset-btn,
+  :root[data-theme="light"] .gear-btn,
+  :root[data-theme="light"] .tasbih-row,
+  :root[data-theme="light"] .day-pill,
+  :root[data-theme="light"] .switch,
+  :root[data-theme="light"] .field-input,
+  :root[data-theme="light"] .month-title,
+  :root[data-theme="light"] .mode-btn{
+    background: var(--bubble-bg);
+    backdrop-filter: var(--bubble-blur);
+    -webkit-backdrop-filter: var(--bubble-blur);
+    box-shadow: var(--bubble-shadow);
+    border-color: var(--line);
+  }
+
+  /* Modals (settings, row settings, calendar) get the same white bubble plus a soft ornamental pattern */
+  :root[data-theme="light"] .sheet{
+    background-image: var(--pattern), var(--bubble-bg);
+    box-shadow: 0 16px 40px rgba(150,115,60,0.18), inset 0 1px 1px rgba(255,255,255,0.95);
+    border-color: var(--line);
+  }
+
+  :root[data-theme="light"] .plus-btn{
+    background: radial-gradient(circle at 40% 30%, rgba(255,255,255,1), rgba(255,250,238,0.7) 55%, rgba(250,238,214,0.5) 100%);
+  }
+
+  :root[data-theme="light"] .plus-btn:active{
+    background: radial-gradient(circle at 40% 30%, rgba(250,238,214,0.9), rgba(240,220,180,0.6));
+  }
+
+  :root[data-theme="light"] .tasbih-row.selected,
+  :root[data-theme="light"] .day-pill.active-day{
+    background: linear-gradient(155deg, rgba(255,250,238,0.95), rgba(250,232,196,0.55));
+  }
+
+  :root[data-theme="light"] .row-progress,
+  :root[data-theme="light"] .day-fill,
+  :root[data-theme="light"] .cal-day-fill{
+    background: linear-gradient(90deg, rgba(189,138,61,0.3), rgba(189,138,61,0.1));
+  }
+
+  :root[data-theme="light"] .tasbih-row.reset-pressing .row-progress{
+    background: linear-gradient(90deg, rgba(205,142,131,0.32), rgba(205,142,131,0.1));
+  }
+
+  :root[data-theme="light"] .reset-btn{
+    border-color: rgba(205,142,131,0.4);
+  }
+
+  :root[data-theme="light"] .reset-btn .reset-fill{
+    background: rgba(205,142,131,0.28);
+  }
+
+  :root[data-theme="light"] .row-settings-fill{
+    background: rgba(189,138,61,0.32);
+  }
+
+  :root[data-theme="light"] .mode-btn.active{
+    background: linear-gradient(155deg, rgba(255,250,238,0.98), rgba(250,232,196,0.6));
+  }
+
+  :root[data-theme="light"] .cal-check{
+    border-color: #ffffff;
+  }
+
 
   *{ box-sizing: border-box; }
 
@@ -34,8 +133,22 @@
     min-height:100%;
     background: radial-gradient(120% 90% at 50% -10%, #1b2338 0%, var(--ink-2) 45%, var(--ink-1) 100%);
     color: var(--cream);
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  /* Feels like a native app, not a webpage: no text selection, no callout/copy bubble */
+  *{
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input, textarea{
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   body{
@@ -43,6 +156,7 @@
     height: 100dvh;
     display:block;
     overflow:hidden;
+    overscroll-behavior: none;
     position:relative;
   }
 
@@ -135,7 +249,7 @@
   }
 
   .eyebrow{
-    font-family:'Fraunces', serif;
+    font-family: var(--font-serif);
     font-style: italic;
     font-weight: 400;
     font-size: 17px;
@@ -145,7 +259,7 @@
   }
 
   h1{
-    font-family:'Fraunces', serif;
+    font-family: var(--font-serif);
     font-optical-sizing: auto;
     font-weight: 340;
     font-size: clamp(30px, 8vw, 42px);
@@ -176,7 +290,7 @@
     border:none;
     background: transparent;
     color: var(--cream-dim);
-    font-family:'Manrope', sans-serif;
+    font-family: var(--font-sans);
     font-size: 13px;
     font-weight: 500;
     padding: 9px 16px;
@@ -208,7 +322,7 @@
   }
 
   .num{
-    font-family:'Fraunces', serif;
+    font-family: var(--font-serif);
     font-weight: 340;
     font-variant-numeric: tabular-nums;
     font-size: clamp(38px, 11vw, 58px);
@@ -230,7 +344,7 @@
   }
 
   .sep{
-    font-family:'Fraunces', serif;
+    font-family: var(--font-serif);
     font-weight: 300;
     font-size: clamp(28px, 8vw, 44px);
     color: var(--gold-soft);
@@ -245,7 +359,7 @@
   }
 
   .closing{
-    font-family:'Fraunces', serif;
+    font-family: var(--font-serif);
     font-style: italic;
     font-size: 15px;
     color: var(--cream-dim);
@@ -267,7 +381,7 @@
     background: transparent;
     border: 1px solid var(--gold-soft);
     color: var(--gold);
-    font-family:'Manrope', sans-serif;
+    font-family: var(--font-sans);
     font-size: 13px;
     font-weight: 500;
     padding: 11px 20px;
@@ -358,7 +472,7 @@
   .overlay.show .sheet{ transform: translateY(0); }
 
   .sheet h2{
-    font-family:'Fraunces', serif;
+    font-family: var(--font-serif);
     font-weight: 400;
     font-size: 20px;
     margin: 0 0 6px;
@@ -382,7 +496,7 @@
     width: 46px;
     height: 54px;
     text-align:center;
-    font-family:'Fraunces', serif;
+    font-family: var(--font-serif);
     font-size: 24px;
     color: var(--cream);
     background: rgba(255,255,255,0.05);
@@ -410,15 +524,19 @@
     border:none;
     background: var(--gold);
     color: #211705;
-    font-family:'Manrope', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
     font-weight: 600;
     padding: 12px;
     border-radius: 12px;
     cursor:pointer;
     margin-bottom: 10px;
+    position:relative;
+    overflow:hidden;
     transition: filter 160ms ease;
   }
+
+  .sheet-btn .reset-fill + span{ position:relative; z-index:1; }
 
   .sheet-btn:hover{ filter: brightness(1.08); }
 
@@ -436,6 +554,10 @@
     color: var(--rose);
     border: 1px solid rgba(207,159,151,0.35);
     font-weight: 500;
+  }
+
+  .full-reset-btn .reset-fill{
+    background: rgba(207,159,151,0.3);
   }
 
   .settings-status{
@@ -464,7 +586,7 @@
   }
 
   .counter-head h2{
-    font-family:'Fraunces', serif;
+    font-family: var(--font-serif);
     font-weight: 340;
     font-size: 22px;
     color: var(--cream);
@@ -574,7 +696,7 @@
   }
 
   .row-name{
-    font-family:'Manrope', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14.5px;
     font-weight: 500;
     color: var(--cream);
@@ -595,7 +717,7 @@
   }
 
   .row-name-input{
-    font-family:'Manrope', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14.5px;
     font-weight: 500;
     color: var(--cream);
@@ -609,7 +731,7 @@
 
   .row-count{
     position:relative;
-    font-family:'Fraunces', serif;
+    font-family: var(--font-serif);
     font-variant-numeric: tabular-nums;
     font-size: 20px;
     color: var(--gold);
@@ -689,7 +811,7 @@
     border: 1px solid var(--line);
     border-radius: 10px;
     color: var(--cream);
-    font-family:'Manrope', sans-serif;
+    font-family: var(--font-sans);
     font-size: 15px;
     padding: 10px 12px;
     outline:none;
@@ -710,7 +832,7 @@
     border: 1px solid var(--line);
     background: rgba(255,255,255,0.03);
     color: var(--cream-dim);
-    font-family:'Manrope', sans-serif;
+    font-family: var(--font-sans);
     font-size: 13px;
     font-weight: 500;
     cursor:pointer;
@@ -730,7 +852,7 @@
     border: 1px solid var(--gold-soft);
     background: radial-gradient(circle at 50% 40%, rgba(199,161,95,0.22), rgba(199,161,95,0.06));
     color: var(--gold);
-    font-family:'Fraunces', serif;
+    font-family: var(--font-serif);
     font-size: 46px;
     font-weight: 300;
     line-height:1;
@@ -756,7 +878,7 @@
     border: 1px solid rgba(207,159,151,0.3);
     background: transparent;
     color: var(--rose);
-    font-family:'Manrope', sans-serif;
+    font-family: var(--font-sans);
     font-size: 12.5px;
     font-weight: 500;
     cursor:pointer;
@@ -805,26 +927,57 @@
 
   /* --- Page 3: daily calendar strip --- */
   .month-title{
-    font-family:'Fraunces', serif;
+    font-family: var(--font-serif);
     font-weight: 340;
-    font-size: 20px;
+    font-size: 18.5px;
     color: var(--cream);
     text-align:left;
-    margin: 0 0 12px;
+    margin: 0 0 16px;
     text-transform: capitalize;
     cursor:pointer;
     display:inline-flex;
     align-items:center;
-    gap:6px;
-    background:none;
-    border:none;
-    padding:0;
+    gap:10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 9px 16px 9px 10px;
+    transition: border-color 180ms ease, background 180ms ease, transform 120ms ease;
   }
 
-  .month-title svg{
-    width:14px;
-    height:14px;
-    opacity:0.6;
+  .month-title:hover{
+    border-color: var(--gold-soft);
+    background: rgba(199,161,95,0.08);
+  }
+
+  .month-title:active{
+    transform: scale(0.97);
+  }
+
+  .month-title .cal-icon-badge{
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(199,161,95,0.16);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+
+  .month-title svg.cal-icon{
+    width:13px;
+    height:13px;
+    color: var(--gold);
+    flex-shrink:0;
+  }
+
+  .month-title .chevron{
+    width:9px;
+    height:9px;
+    color: var(--cream-dim);
+    opacity:0.7;
+    margin-left: 2px;
     flex-shrink:0;
   }
 
@@ -853,14 +1006,30 @@
     border: 1px solid var(--line);
     background: rgba(255,255,255,0.03);
     color: var(--cream-dim);
-    font-family:'Manrope', sans-serif;
+    font-family: var(--font-sans);
     font-size: 13px;
     font-weight: 600;
     display:flex;
     align-items:center;
     justify-content:center;
     cursor:pointer;
+    overflow:hidden;
+    user-select:none;
+    -webkit-user-select:none;
     transition: border-color 160ms ease, color 160ms ease;
+  }
+
+  .cal-day-fill{
+    position:absolute;
+    inset:0;
+    width:0%;
+    background: linear-gradient(90deg, rgba(199,161,95,0.32), rgba(199,161,95,0.12));
+    z-index:0;
+  }
+
+  .cal-day-num{
+    position:relative;
+    z-index:1;
   }
 
   .cal-day.empty{
@@ -899,6 +1068,7 @@
     align-items:center;
     justify-content:center;
     border: 1.5px solid var(--ink-2);
+    z-index:2;
   }
 
   .cal-check svg{
@@ -925,6 +1095,94 @@
     background: #3fa66a;
   }
 
+  /* --- Light theme: fully white soap-bubble calendar days --- */
+  :root[data-theme="light"] .cal-day{
+    position:relative;
+    overflow:hidden;
+    border-color: rgba(189,138,61,0.16);
+    background: linear-gradient(155deg, rgba(255,255,255,0.99) 0%, rgba(255,255,255,0.85) 55%, rgba(255,255,255,0.62) 100%);
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,1),
+      0 3px 8px rgba(150,115,60,0.12);
+  }
+
+  :root[data-theme="light"] .cal-day::before{
+    content:'';
+    position:absolute;
+    top:-45%;
+    left:-25%;
+    width:65%;
+    height:65%;
+    background: radial-gradient(circle, rgba(255,255,255,0.98), rgba(255,255,255,0) 72%);
+    transform: rotate(-15deg);
+    pointer-events:none;
+  }
+
+  :root[data-theme="light"] .cal-day.today{
+    border-color: rgba(205,142,131,0.55);
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,1),
+      0 0 0 1px rgba(205,142,131,0.28),
+      0 3px 10px rgba(205,142,131,0.2);
+  }
+
+  :root[data-theme="light"] .cal-day.cal-active{
+    border-color: var(--gold);
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,1),
+      0 0 0 2px rgba(189,138,61,0.3),
+      0 4px 12px rgba(189,138,61,0.26);
+  }
+
+  :root[data-theme="light"] .cal-day.done{
+    background: linear-gradient(155deg, rgba(230,250,238,0.98) 0%, rgba(255,255,255,0.7) 55%, rgba(255,255,255,0.5) 100%);
+    border-color: rgba(63,166,106,0.4);
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,1),
+      0 4px 12px rgba(63,166,106,0.2);
+  }
+
+  :root[data-theme="light"] .cal-check{
+    border-color: #ffffff;
+    box-shadow: 0 1px 4px rgba(63,166,106,0.4);
+  }
+
+  /* --- Celebration toast: goal / day completed --- */
+  .toast{
+    position:fixed;
+    top: max(18px, env(safe-area-inset-top));
+    left:50%;
+    transform: translateX(-50%) translateY(-14px);
+    background: linear-gradient(135deg, #2f8f5c, #3fa66a);
+    color:#fff;
+    padding: 12px 18px;
+    border-radius: 14px;
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    font-weight: 600;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    max-width: 88vw;
+    text-align:left;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+    opacity:0;
+    pointer-events:none;
+    z-index: 70;
+    transition: opacity 220ms ease, transform 220ms ease;
+  }
+
+  .toast.show{
+    opacity:1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.day{
+    background: linear-gradient(135deg, #c7a15f, #3fa66a);
+  }
+
+  .toast-emoji{ font-size:16px; flex-shrink:0; }
+
   .day-strip{
     display:flex;
     gap: 8px;
@@ -932,6 +1190,7 @@
     padding: 2px 2px 14px;
     margin-bottom: 12px;
     scrollbar-width: none;
+    touch-action: pan-x;
   }
 
   .day-strip::-webkit-scrollbar{ display:none; }
@@ -944,7 +1203,7 @@
     border: 1px solid var(--line);
     background: rgba(255,255,255,0.03);
     color: var(--cream-dim);
-    font-family:'Manrope', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
     font-weight: 600;
     display:flex;
@@ -998,6 +1257,11 @@
 </head>
 <body>
 <div class="veil"></div>
+
+<div class="toast" id="toastEl">
+  <span class="toast-emoji">🎉</span>
+  <span id="toastText"></span>
+</div>
 
 <button class="gear-btn" id="gearBtn" type="button" aria-label="Настройки">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -1064,11 +1328,35 @@
       <button class="sheet-btn" id="holdTimesSave" type="button">Сохранить время удержания</button>
 
       <div class="field">
+        <label>Тема оформления</label>
+        <div class="mode-toggle">
+          <button type="button" class="mode-btn" id="themeDarkBtn">Тёмная</button>
+          <button type="button" class="mode-btn" id="themeLightBtn">Светлая</button>
+        </div>
+      </div>
+
+      <div class="field">
         <label for="cheatInput">Чит-код</label>
         <input type="text" autocomplete="off" id="cheatInput" class="field-input" placeholder="•••">
       </div>
 
+      <button class="sheet-btn" id="installBtnSettings" type="button">Установить приложение</button>
+      <p class="counter-hint" id="installHintSettings" style="display:none; text-align:center; margin: -6px 0 12px;"></p>
+
+      <button class="sheet-btn danger full-reset-btn" id="fullResetBtn" type="button">
+        <span class="reset-fill" id="fullResetFill"></span>
+        <span>Полный сброс приложения</span>
+      </button>
+
       <button class="sheet-btn ghost" id="menuClose" type="button">Закрыть</button>
+    </div>
+
+    <!-- Step: final confirmation for full reset -->
+    <div class="step" id="stepConfirmReset">
+      <h2>Точно всё удалить?</h2>
+      <p class="sub">Счётчики зикра, пароль, тема и все настройки будут стёрты без возможности восстановления.</p>
+      <button class="sheet-btn danger" id="confirmResetBtn" type="button">Да, удалить всё</button>
+      <button class="sheet-btn ghost" id="cancelResetBtn" type="button">Отмена</button>
     </div>
 
     <!-- Step: set / change new 4-digit pin -->
@@ -1190,12 +1478,17 @@
 <div class="page page3">
 <div class="counter-card">
   <button type="button" class="month-title" id="monthTitle">
+    <span class="cal-icon-badge">
+      <svg class="cal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4.5" width="18" height="16" rx="2.5"></rect>
+        <path d="M3 9.5h18"></path>
+        <path d="M8 2.5v4"></path>
+        <path d="M16 2.5v4"></path>
+      </svg>
+    </span>
     <span id="monthTitleText">Месяц</span>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="4.5" width="18" height="16" rx="2.5"></rect>
-      <path d="M3 9.5h18"></path>
-      <path d="M8 2.5v4"></path>
-      <path d="M16 2.5v4"></path>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 6l6 6-6 6"></path>
     </svg>
   </button>
   <div class="day-strip" id="dayStrip"></div>
@@ -1231,6 +1524,57 @@
 </div>
 
 <script>
+  // --- Safe local storage: always saves automatically; falls back to in-memory
+  // for this session if localStorage is unavailable (private browsing, quota, etc.) ---
+  const memoryFallback = {};
+  let storageBroken = false;
+  function lsGet(key){
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      storageBroken = true;
+      return Object.prototype.hasOwnProperty.call(memoryFallback, key) ? memoryFallback[key] : null;
+    }
+  }
+  function lsSet(key, value){
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      storageBroken = true;
+      memoryFallback[key] = value;
+    }
+  }
+  function lsRemove(key){
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      storageBroken = true;
+      delete memoryFallback[key];
+    }
+  }
+
+  // --- Theme: dark (default) or light beige/white with a bubbly glass look ---
+  const THEME_KEY = 'wedding-theme';
+  function loadTheme(){
+    const v = lsGet(THEME_KEY);
+    return v === 'dark' ? 'dark' : 'light';
+  }
+  function applyTheme(theme){
+    if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    else document.documentElement.removeAttribute('data-theme');
+    const meta = document.getElementById('themeColorMeta');
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#fbf1de' : '#111827');
+  }
+  let currentTheme = loadTheme();
+  applyTheme(currentTheme);
+
+  // Belt-and-braces: block selection/copy callout and long-press context menu everywhere
+  document.addEventListener('contextmenu', (e) => e.preventDefault());
+  document.addEventListener('selectstart', (e) => {
+    const tag = e.target.tagName;
+    if (tag !== 'INPUT' && tag !== 'TEXTAREA') e.preventDefault();
+  });
+
   const state = { target: new Date('2027-11-27T00:00:00') };
   const els = {
     d: document.getElementById('d'),
@@ -1265,7 +1609,7 @@
     els.headline.textContent = RU_HEADLINE[iso];
     els.sub.textContent = RU_WEEKDAY[iso];
     setActiveButton(iso);
-    localStorage.setItem('wedding-date', iso);
+    lsSet('wedding-date', iso);
     tick();
   }
 
@@ -1299,7 +1643,7 @@
   els.btnJuly.addEventListener('click', () => { feedbackToggle(); selectDate(els.btnJuly.dataset.date); });
   els.btnNov.addEventListener('click', () => { feedbackToggle(); selectDate(els.btnNov.dataset.date); });
 
-  const saved = localStorage.getItem('wedding-date');
+  const saved = lsGet('wedding-date');
   if (saved && RU_HEADLINE[saved]) {
     selectDate(saved);
   } else {
@@ -1312,6 +1656,8 @@
   // --- PWA install prompt ---
   let deferredPrompt = null;
   const installBtn = document.getElementById('installBtn');
+  const installBtnSettings = document.getElementById('installBtnSettings');
+  const installHintSettings = document.getElementById('installHintSettings');
 
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -1319,32 +1665,49 @@
     installBtn.classList.add('show');
   });
 
-  installBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    feedbackTap();
+  async function tryInstall(){
+    if (!deferredPrompt) return false;
     deferredPrompt.prompt();
     await deferredPrompt.userChoice;
     deferredPrompt = null;
     installBtn.classList.remove('show');
+    return true;
+  }
+
+  installBtn.addEventListener('click', async () => {
+    feedbackTap();
+    await tryInstall();
+  });
+
+  installBtnSettings.addEventListener('click', async () => {
+    feedbackTap();
+    const installed = await tryInstall();
+    if (!installed) {
+      installHintSettings.style.display = 'block';
+      installHintSettings.textContent = isIOSGlobal
+        ? 'На iPhone/iPad: нажмите «Поделиться» внизу браузера и выберите «На экран «Домой»»'
+        : 'Откройте меню браузера (⋮ или ⋯) и выберите «Установить приложение» или «Добавить на главный экран»';
+    }
   });
 
   window.addEventListener('appinstalled', () => {
     installBtn.classList.remove('show');
+    installHintSettings.style.display = 'none';
   });
 
   // iOS has no beforeinstallprompt — show manual hint
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isIOSGlobal = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-  if (isIOS && !isStandalone) {
+  if (isIOSGlobal && !isStandalone) {
     document.getElementById('iosHint').style.display = 'block';
   }
 
   // --- 4-digit PIN: lock screen + settings ---
   const PIN_KEY = 'wedding-pin';
 
-  function getPin(){ return localStorage.getItem(PIN_KEY); }
-  function setPin(v){ localStorage.setItem(PIN_KEY, v); }
-  function clearPin(){ localStorage.removeItem(PIN_KEY); }
+  function getPin(){ return lsGet(PIN_KEY); }
+  function setPin(v){ lsSet(PIN_KEY, v); }
+  function clearPin(){ lsRemove(PIN_KEY); }
 
   function wirePinRow(row, onComplete){
     const inputs = Array.from(row.querySelectorAll('input'));
@@ -1392,11 +1755,12 @@
   const stepVerify = document.getElementById('stepVerify');
   const stepMenu = document.getElementById('stepMenu');
   const stepSetPin = document.getElementById('stepSetPin');
+  const stepConfirmReset = document.getElementById('stepConfirmReset');
   const pinStatus = document.getElementById('pinStatus');
   const removePinBtn = document.getElementById('removePinBtn');
 
   function showStep(step){
-    [stepVerify, stepMenu, stepSetPin].forEach(s => s.classList.remove('active'));
+    [stepVerify, stepMenu, stepSetPin, stepConfirmReset].forEach(s => s.classList.remove('active'));
     step.classList.add('active');
   }
 
@@ -1409,6 +1773,7 @@
       removePinBtn.style.display = 'none';
     }
     refreshHoldInputs();
+    refreshThemeButtons();
   }
 
   function openSettings(){
@@ -1466,6 +1831,43 @@
     feedbackTap();
     refreshStatus();
     showStep(stepMenu);
+  });
+
+  // --- Full app reset: 30s hold, then a final confirmation step ---
+  const fullResetBtn = document.getElementById('fullResetBtn');
+  const fullResetFill = document.getElementById('fullResetFill');
+  let fullResetTimer = null;
+
+  function fullResetStart(){
+    startFill(fullResetFill, 20000);
+    fullResetTimer = setTimeout(() => {
+      stopFill(fullResetFill);
+      feedbackToggle();
+      showStep(stepConfirmReset);
+    }, 20000);
+  }
+  function fullResetCancel(){
+    clearTimeout(fullResetTimer);
+    stopFill(fullResetFill);
+  }
+  fullResetBtn.addEventListener('pointerdown', fullResetStart);
+  fullResetBtn.addEventListener('pointerup', fullResetCancel);
+  fullResetBtn.addEventListener('pointerleave', fullResetCancel);
+  fullResetBtn.addEventListener('pointercancel', fullResetCancel);
+  fullResetBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  document.getElementById('cancelResetBtn').addEventListener('click', () => {
+    feedbackTap();
+    showStep(stepMenu);
+  });
+
+  document.getElementById('confirmResetBtn').addEventListener('click', () => {
+    feedbackReset();
+    ['wedding-theme', 'wedding-date', 'wedding-pin', 'wedding-hold-times',
+     'wedding-page1-visible', 'wedding-tasbih', 'wedding-tasbih-daily'
+    ].forEach((k) => lsRemove(k));
+    closeSettings();
+    location.reload();
   });
 
   settingsOverlay.addEventListener('click', (e) => {
@@ -1562,20 +1964,49 @@
     vibrate([30, 40, 30, 40, 30]);
   }
 
+  // Cheerful ascending arpeggio — a single zikr goal reached
+  function feedbackGoalReached(){
+    tone(660, 0, 0.1, { type: 'sine', volume: 0.17 });
+    tone(830, 0.09, 0.1, { type: 'sine', volume: 0.18 });
+    tone(990, 0.18, 0.18, { type: 'sine', volume: 0.19 });
+    vibrate([20, 30, 20, 30, 40]);
+  }
+
+  // Fuller fanfare — every goal for the day reached
+  function feedbackDayComplete(){
+    tone(560, 0, 0.09, { type: 'sine', volume: 0.17 });
+    tone(700, 0.08, 0.09, { type: 'sine', volume: 0.18 });
+    tone(880, 0.16, 0.1, { type: 'sine', volume: 0.19 });
+    tone(1100, 0.26, 0.22, { type: 'sine', volume: 0.2 });
+    vibrate([25, 30, 25, 30, 25, 30, 60]);
+  }
+
+  // Green celebration toast — auto-hides after ~1 second
+  const toastEl = document.getElementById('toastEl');
+  const toastTextEl = document.getElementById('toastText');
+  let toastTimer = null;
+  function showToast(text, variant){
+    toastTextEl.textContent = text;
+    toastEl.classList.toggle('day', variant === 'day');
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1000);
+  }
+
   // --- Configurable hold times (long-press durations) ---
   const HOLD_KEY = 'wedding-hold-times';
   function loadHoldTimes(){
     try {
-      const raw = JSON.parse(localStorage.getItem(HOLD_KEY));
+      const raw = JSON.parse(lsGet(HOLD_KEY));
       if (raw && typeof raw.row === 'number' && typeof raw.reset === 'number' && typeof raw.day === 'number') {
-        if (typeof raw.settings !== 'number') raw.settings = 1;
+        if (typeof raw.settings !== 'number') raw.settings = 0.5;
         return raw;
       }
     } catch (e) {}
-    return { row: 5, reset: 5, day: 1, settings: 1 }; // seconds — matches current defaults
+    return { row: 2, reset: 4, day: 0.5, settings: 0.5 }; // seconds — new defaults
   }
   let holdTimes = loadHoldTimes();
-  function saveHoldTimes(){ localStorage.setItem(HOLD_KEY, JSON.stringify(holdTimes)); }
+  function saveHoldTimes(){ lsSet(HOLD_KEY, JSON.stringify(holdTimes)); }
 
   function refreshHoldInputs(){
     document.getElementById('holdRowInput').value = holdTimes.row;
@@ -1583,6 +2014,27 @@
     document.getElementById('holdDayInput').value = holdTimes.day;
     document.getElementById('holdSettingsInput').value = holdTimes.settings;
   }
+
+  function refreshThemeButtons(){
+    document.getElementById('themeDarkBtn').classList.toggle('active', currentTheme === 'dark');
+    document.getElementById('themeLightBtn').classList.toggle('active', currentTheme === 'light');
+  }
+
+  document.getElementById('themeDarkBtn').addEventListener('click', () => {
+    currentTheme = 'dark';
+    lsSet(THEME_KEY, currentTheme);
+    applyTheme(currentTheme);
+    feedbackToggle();
+    refreshThemeButtons();
+  });
+
+  document.getElementById('themeLightBtn').addEventListener('click', () => {
+    currentTheme = 'light';
+    lsSet(THEME_KEY, currentTheme);
+    applyTheme(currentTheme);
+    feedbackToggle();
+    refreshThemeButtons();
+  });
 
   document.getElementById('holdTimesSave').addEventListener('click', () => {
     const row = Math.max(0.5, parseFloat(document.getElementById('holdRowInput').value) || holdTimes.row);
@@ -1599,7 +2051,7 @@
   const PAGE1_KEY = 'wedding-page1-visible';
   const CHEAT_PHRASE = 'идрис+амина';
   function loadPage1Visible(){
-    const v = localStorage.getItem(PAGE1_KEY);
+    const v = lsGet(PAGE1_KEY);
     return v === 'true'; // default: hidden
   }
   let page1Visible = loadPage1Visible();
@@ -1670,6 +2122,10 @@
   });
 
   pagesEl.addEventListener('touchstart', (e) => {
+    if (e.target.closest('.day-strip')) {
+      dragging = false;
+      return;
+    }
     startX = e.touches[0].clientX;
     currentX = startX;
     dragging = true;
@@ -1703,7 +2159,7 @@
       currentPage = currentPage + 1;
     }
     page1Visible = !page1Visible;
-    localStorage.setItem(PAGE1_KEY, String(page1Visible));
+    lsSet(PAGE1_KEY, String(page1Visible));
     rebuildDots();
     setPage(currentPage, false);
   }
@@ -1725,7 +2181,7 @@
 
   function loadTasbih(){
     try {
-      const raw = JSON.parse(localStorage.getItem(TASBIH_KEY));
+      const raw = JSON.parse(lsGet(TASBIH_KEY));
       if (Array.isArray(raw) && raw.length === 5) return raw;
     } catch (e) {}
     return DEFAULT_ROWS.map(r => ({ ...r }));
@@ -1734,7 +2190,7 @@
   const tasbih = { rows: loadTasbih(), selected: null };
 
   function saveTasbih(){
-    localStorage.setItem(TASBIH_KEY, JSON.stringify(tasbih.rows));
+    lsSet(TASBIH_KEY, JSON.stringify(tasbih.rows));
   }
 
   const tasbihList = document.getElementById('tasbihList');
@@ -1898,7 +2354,7 @@
 
   function loadDaily(){
     try {
-      const raw = JSON.parse(localStorage.getItem(DAILY_KEY));
+      const raw = JSON.parse(lsGet(DAILY_KEY));
       if (raw && Array.isArray(raw.names) && raw.names.length === 5 && raw.counts) {
         if (!Array.isArray(raw.settings) || raw.settings.length !== 5) {
           raw.settings = raw.names.map(() => defaultRowSettings());
@@ -1920,7 +2376,7 @@
   let viewDay = activeDay;
 
   function saveDaily(){
-    localStorage.setItem(DAILY_KEY, JSON.stringify({ names: daily.names, counts: daily.counts, settings: daily.settings, lastSelectedDay: activeDay }));
+    lsSet(DAILY_KEY, JSON.stringify({ names: daily.names, counts: daily.counts, settings: daily.settings, lastSelectedDay: activeDay }));
   }
 
   function getDayCounts(day){
@@ -2121,13 +2577,29 @@
     if (daily.selectedRow === null) { counterHint2.innerHTML = 'Сначала выберите строку — удержите её 5 секунд'; return; }
     const i = daily.selectedRow;
     const step = daily.settings[i].step || 1;
+    const goal = daily.settings[i].goal;
     const counts = getDayCounts(activeDay);
+    const prevCount = counts[i];
+    const dayWasComplete = isDayCompleted(activeDay);
+
     counts[i] += step;
     viewDay = activeDay;
     saveDaily();
     feedbackPlus();
     renderDayStrip();
     renderTasbih2();
+
+    const wasRowDone = goal > 0 && prevCount >= goal;
+    const rowDoneNow = goal > 0 && counts[i] >= goal;
+    const dayDoneNow = isDayCompleted(activeDay);
+
+    if (!dayWasComplete && dayDoneNow) {
+      feedbackDayComplete();
+      showToast('Поздравляем! Все цели дня выполнены', 'day');
+    } else if (!wasRowDone && rowDoneNow) {
+      feedbackGoalReached();
+      showToast(`Поздравляем! Цель «${daily.names[i]}» выполнена`, 'row');
+    }
   });
 
   document.getElementById('minusBtn2').addEventListener('click', () => {
@@ -2271,16 +2743,49 @@
         + (done ? ' done' : '')
         + (day === todayDate ? ' today' : '')
         + (day === activeDay ? ' cal-active' : '');
-      cell.innerHTML = `${day}` + (done ? `<span class="cal-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 12l5 5L20 6"></path></svg></span>` : '');
-      cell.addEventListener('click', () => {
+      cell.innerHTML = `<span class="cal-day-fill"></span><span class="cal-day-num">${day}</span>` + (done ? `<span class="cal-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 12l5 5L20 6"></path></svg></span>` : '');
+      wireCalDaySelect(cell, day);
+      calGrid.appendChild(cell);
+    }
+  }
+
+  function wireCalDaySelect(cell, day){
+    let holdTimer = null;
+    let activated = false;
+    function start(){
+      activated = false;
+      startFill(cell.querySelector('.cal-day-fill'), holdTimes.day * 1000);
+      holdTimer = setTimeout(() => {
+        activated = true;
+        activeDay = day;
+        viewDay = day;
+        saveDaily();
+        feedbackSelect();
+        renderDayStrip();
+        renderTasbih2();
+        closeMonthCalendar();
+      }, holdTimes.day * 1000);
+    }
+    function release(){
+      clearTimeout(holdTimer);
+      stopFill(cell.querySelector('.cal-day-fill'));
+      if (!activated) {
         viewDay = day;
         feedbackToggle();
         renderDayStrip();
         renderTasbih2();
         closeMonthCalendar();
-      });
-      calGrid.appendChild(cell);
+      }
     }
+    function cancel(){
+      clearTimeout(holdTimer);
+      stopFill(cell.querySelector('.cal-day-fill'));
+    }
+    cell.addEventListener('pointerdown', start);
+    cell.addEventListener('pointerup', release);
+    cell.addEventListener('pointerleave', cancel);
+    cell.addEventListener('pointercancel', cancel);
+    cell.addEventListener('contextmenu', (e) => e.preventDefault());
   }
 
   function openMonthCalendar(){
